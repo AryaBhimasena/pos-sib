@@ -1,0 +1,276 @@
+/* ===================================================== */
+/* DASHBOARD */
+/* ===================================================== */
+
+/* ================= HEADER ================= */
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.dashboard-header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ================= QUICK ACTION ================= */
+
+.dashboard-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action {
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.action.primary {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+/* ===============================
+   KPI CARDS
+================================ */
+.dashboard-kpi {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  border-left: 4px solid #e5e7eb;
+}
+
+.kpi-card.service { border-color: #2563eb; }
+.kpi-card.warning { border-color: #f59e0b; }
+.kpi-card.success { border-color: #10b981; }
+.kpi-card.revenue { border-color: #2563eb; }
+
+.kpi-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kpi-label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.kpi-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+}
+
+/* ===============================
+   REMINDER SECTION
+================================ */
+.dashboard-reminder {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.reminder {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  border-left: 4px solid;
+}
+
+.reminder.overdue { border-color: #ef4444; }
+.reminder.due { border-color: #f59e0b; }
+
+.reminder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.reminder-header strong {
+  font-size: 14px;
+  color: #111827;
+}
+
+.reminder-header .link {
+  font-size: 12px;
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+.reminder-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.reminder-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f9fafb;
+  margin-bottom: 6px;
+}
+
+.reminder-list li:last-child {
+  margin-bottom: 0;
+}
+
+.reminder-list .nota {
+  font-weight: 500;
+  font-size: 13px;
+  color: #111827;
+}
+
+.reminder-list small {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+
+/* ================= TABLE ================= */
+
+.dashboard-section h3 {
+  margin-bottom: 16px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.dashboard-table th {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #6b7280;
+}
+
+.dashboard-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* ================= STATUS ================= */
+
+.status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.status.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status.info {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.status.danger {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+/* ================= ROW STATE ================= */
+
+.row-overdue {
+  background: #fff7f7;
+}
+
+/* ===================================================== */
+/* KPI DASHBOARD */
+/* ===================================================== */
+
+.dashboard-kpi {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) 1.4fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.kpi-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+.kpi-card span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.kpi-card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* VARIANT */
+.kpi-card.service strong {
+  color: #2563eb;
+}
+
+.kpi-card.warning strong {
+  color: #d97706;
+}
+
+.kpi-card.success strong {
+  color: #16a34a;
+}
+
+.kpi-card.revenue {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  border: none;
+}
+
+.kpi-card.revenue span {
+  color: rgba(255,255,255,0.8);
+}
+
+.kpi-card.revenue strong {
+  font-size: 24px;
+}

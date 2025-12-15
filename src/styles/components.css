@@ -1,0 +1,452 @@
+/* ===================================================== */
+/* GLOBAL RESET (UI COMPONENTS) */
+/* ===================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f1f5f9;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #111827;
+}
+
+/* ===================================================== */
+/* APP LAYOUT */
+/* ===================================================== */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1;
+  padding: 24px;
+}
+
+/* ===============================
+   SIDEBAR
+================================ */
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ===============================
+   BRAND
+================================ */
+.sidebar-brand {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.sidebar-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.sidebar-store {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.sidebar-store span {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+/* ===============================
+   MENU
+================================ */
+.sidebar-menu {
+  flex: 1;
+  padding: 16px 12px;
+  overflow-y: auto;
+}
+
+.menu-item {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+.menu-item:hover {
+  background: #f3f4f6;
+}
+
+.menu-item.active {
+  background: #eef2ff;
+  color: #1d4ed8;
+  font-weight: 500;
+}
+
+/* SECTION */
+.menu-section {
+  margin-bottom: 14px;
+}
+
+.menu-parent {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  padding: 6px 14px;
+  text-transform: uppercase;
+}
+
+.menu-group {
+  margin-top: 4px;
+}
+
+.menu-child {
+  padding: 8px 14px 8px 28px;
+  font-size: 13px;
+  color: #374151;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.menu-child:hover {
+  background: #f3f4f6;
+}
+
+/* ===============================
+   FOOTER
+================================ */
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.sidebar-logout {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #dc2626;
+  cursor: pointer;
+}
+
+.sidebar-logout:hover {
+  background: #fef2f2;
+}
+
+
+/* =====================================================
+   HEADER (GLOBAL APP HEADER)
+===================================================== */
+
+.app-header {
+  height: 52px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* LEFT */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.header-user {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.header-user .greeting {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.header-user .username {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.header-user .role {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* RIGHT */
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-datetime {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+
+/* ===================================================== */
+/* CONTAINER CARD */
+/* ===================================================== */
+
+.container-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px;
+  min-height: 100%;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+/* ================= MODAL ================= */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-container.large {
+  background: #fff;
+  width: 95%;
+  max-width: 1400px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  max-height: 92vh;
+}
+
+.modal-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-content.two-column {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 20px;
+  padding: 18px;
+  overflow: auto;
+}
+
+/* ================= FORM ================= */
+
+.service-form label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 10px;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 10px;
+}
+
+/* Estimasi biaya */
+.form-grid-biaya {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.biaya-input input {
+  font-weight: 600;
+  background: #f9fafb;
+}
+
+.form-section {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed #e5e7eb;
+}
+
+/* ================= NOTA ================= */
+
+.service-preview.landscape {
+  background: #f3f4f6;
+  padding: 14px;
+}
+
+.nota-landscape {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  padding: 18px;
+  font-size: 13px;
+}
+
+.nota-kop {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.nota-logo {
+  width: 56px;
+  height: 56px;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+
+.nota-identitas span {
+  display: block;
+  font-size: 12px;
+}
+
+.nota-no {
+  text-align: right;
+}
+
+.nota-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 12px 0;
+}
+
+.nota-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 10px;
+}
+
+.nota-grid label {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.nota-keluhan {
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px dashed #d1d5db;
+}
+
+.nota-footer {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.ttd-box {
+  width: 120px;
+  height: 40px;
+  border: 1px dashed #d1d5db;
+  margin-top: 4px;
+}
+
+/* ================= FOOTER ================= */
+
+.modal-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 14px 18px;
+}
+
+.footer-actions.full {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.footer-group {
+  display: flex;
+  flex-direction: column;
+  margin-right: auto;
+}
+
+/* ================= BUTTON ================= */
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: #2563eb;
+  color: #fff;
+}
+
+.btn.secondary {
+  background: #e5e7eb;
+}
+
+.btn.wa {
+  background: #22c55e;
+  color: #fff;
+}
+
+.btn.print {
+  background: #0f172a;
+  color: #fff;
+}
