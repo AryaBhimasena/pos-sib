@@ -153,7 +153,7 @@ export default function ServiceModal({ open, onClose }) {
               <div className="nota-kop">
                 <div className="nota-logo">LOGO</div>
                 <div className="nota-identitas">
-                  <strong>HARMONI PHONE SERVICE</strong>
+                  <strong>SIB SERVICE CENTER</strong>
                   <span>Jl. Contoh No. 12</span>
                   <span>Telp / WA: 0812-xxxx-xxxx</span>
                 </div>

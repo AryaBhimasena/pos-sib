@@ -16,7 +16,7 @@ export default function Header() {
         <div className="header-avatar">A</div>
 
         <div className="header-user">
-          <strong className="username">Andi</strong>
+          <strong className="username">Siwa</strong>
           <small className="role">Owner / Kasir</small>
         </div>
       </div>

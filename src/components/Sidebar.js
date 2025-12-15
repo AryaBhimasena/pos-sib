@@ -5,9 +5,9 @@ export default function Sidebar() {
     <aside className="sidebar">
       {/* BRAND */}
       <div className="sidebar-brand">
-        <div className="sidebar-logo">TS</div>
+        <div className="sidebar-logo">SIB</div>
         <div className="sidebar-store">
-          Toko Service Jaya
+          SIB Service Center
           <span>Service & Penjualan</span>
         </div>
       </div>
