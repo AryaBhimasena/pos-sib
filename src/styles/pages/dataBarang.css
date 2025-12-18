@@ -1,0 +1,85 @@
+/* ================================================= */
+/* DATA BARANG - FILTER */
+/* ================================================= */
+
+.databarang-filter {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.filter-search {
+  flex: 1;
+}
+
+.filter-search input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.filter-search input::placeholder {
+  color: #9ca3af;
+}
+
+.filter-search input:focus {
+  outline: none;
+  border-color: #111827;
+}
+
+.filter-select {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-select select {
+  min-width: 160px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.filter-select select:focus {
+  outline: none;
+  border-color: #111827;
+}
+
+/* ================================================= */
+/* TABLE ACTION BUTTONS */
+/* ================================================= */
+
+.table-actions {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: #f2f4f7;
+  color: #000;
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}

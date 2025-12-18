@@ -1,5 +1,5 @@
 import "../styles/components.css";
-import "../styles/global.css"; // ← WAJIB DI SINI
+import "../styles/global.css";
 
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
