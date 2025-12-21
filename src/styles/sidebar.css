@@ -1,6 +1,13 @@
+/* ===============================
+   SIDEBAR
+================================ */
+
 .sidebar {
   width: 260px;
   height: 100vh;
+  position: sticky;
+  top: 0;
+  
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
   display: flex;
@@ -8,38 +15,47 @@
   font-family: system-ui, -apple-system, sans-serif;
 }
 
-/* PROFILE */
-.sidebar-profile {
-  padding: 24px;
-  text-align: center;
+/* ===============================
+   BRAND
+================================ */
+.sidebar-brand {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   border-bottom: 1px solid #f1f5f9;
 }
 
-.avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: #e5e7eb;
+.sidebar-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 12px;
   font-weight: 600;
-  color: #374151;
+  font-size: 16px;
 }
 
-.profile-name {
+.sidebar-store {
   font-size: 14px;
   font-weight: 600;
   color: #111827;
+  line-height: 1.2;
 }
 
-.profile-role {
-  font-size: 12px;
+.sidebar-store span {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
   color: #6b7280;
 }
 
-/* MENU */
+/* ===============================
+   MENU
+================================ */
 .sidebar-menu {
   flex: 1;
   padding: 16px;
@@ -47,10 +63,13 @@
 }
 
 .menu-item {
+  display: block;
   padding: 10px 14px;
+  margin-bottom: 4px;
   border-radius: 8px;
   font-size: 14px;
   color: #374151;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -58,22 +77,32 @@
   background: #f3f4f6;
 }
 
+.menu-item.active {
+  background: #e0f2fe;
+  color: #0369a1;
+  font-weight: 600;
+}
+
 .menu-group {
   margin-bottom: 12px;
 }
 
 .menu-group-title {
+  margin: 16px 8px 6px;
   font-size: 12px;
   font-weight: 600;
   color: #6b7280;
-  margin: 12px 0 6px;
+  text-transform: uppercase;
 }
+
 
 .menu-group-children {
   padding-left: 8px;
 }
 
-/* LOGOUT */
+/* ===============================
+   FOOTER
+================================ */
 .sidebar-logout {
   padding: 16px;
   border-top: 1px solid #f1f5f9;

@@ -1,0 +1,120 @@
+/* ================= PENJUALAN ================= */
+
+.transaksi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.transaksi-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.transaksi-header p {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ================= SUMMARY ================= */
+
+.transaksi-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.summary-card {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.summary-card span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.summary-card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 18px;
+}
+
+.summary-card.primary strong { color: #2563eb; }
+.summary-card.success strong { color: #16a34a; }
+.summary-card.warning strong { color: #d97706; }
+
+/* ================= FILTER ================= */
+
+.transaksi-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.transaksi-toolbar input,
+.transaksi-toolbar select {
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+/* ================= TABLE ================= */
+
+.transaksi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.transaksi-table th {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #6b7280;
+}
+
+.transaksi-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.transaksi-table td.right {
+  text-align: right;
+}
+
+.transaksi-table .empty {
+  text-align: center;
+  padding: 24px;
+  color: #9ca3af;
+}
+
+/* ================= STATUS ================= */
+
+.status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.status.Lunas {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.lunas {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.belum-lunas {
+  background: #fef3c7;
+  color: #92400e;
+}

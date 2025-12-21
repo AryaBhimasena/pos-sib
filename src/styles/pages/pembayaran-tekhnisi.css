@@ -1,0 +1,39 @@
+.section-desc {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+
+.keuangan-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.keuangan-table th,
+.keuangan-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+}
+
+.keuangan-table th {
+  background: #f9fafb;
+  text-align: left;
+}
+
+.right {
+  text-align: right;
+}
+
+.paid {
+  color: #065f46;
+}
+
+.unpaid {
+  color: #92400e;
+}
+
+.action.small {
+  padding: 6px 12px;
+  font-size: 12px;
+}

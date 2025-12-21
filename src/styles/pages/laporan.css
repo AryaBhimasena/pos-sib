@@ -1,0 +1,164 @@
+/* ================= HEADER ================= */
+.laporan-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.laporan-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.laporan-header p {
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
+/* ================= FILTER ================= */
+.laporan-filter {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.filter-group input,
+.filter-group select {
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+/* ================= SUMMARY ================= */
+.laporan-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.summary-card span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.summary-card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 16px;
+}
+
+.summary-card.expense {
+  background: #fff1f2;
+}
+
+.summary-card.profit {
+  background: #ecfdf5;
+}
+
+.summary-card.info {
+  background: #eff6ff;
+}
+
+/* ================= DUAL SECTION ================= */
+.laporan-dual {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.jasa-section {
+  width: 30%;
+}
+
+.teknisi-section {
+  width: 70%;
+}
+
+/* ================= SECTION ================= */
+.laporan-section {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  background: #ffffff;
+}
+
+.laporan-section h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+/* ================= TABLE ================= */
+.laporan-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.laporan-table th,
+.laporan-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 13px;
+}
+
+.laporan-table th {
+  text-align: left;
+  color: #374151;
+}
+
+.laporan-table td.right,
+.laporan-table th.right {
+  text-align: right;
+}
+
+/* ================= TEXT COLOR ================= */
+.paid-text {
+  color: #047857;
+  font-weight: 500;
+}
+
+.unpaid-text {
+  color: #b45309;
+  font-weight: 500;
+}
+
+.profit-text {
+  color: #065f46;
+  font-weight: 500;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px) {
+  .laporan-dual {
+    flex-direction: column;
+  }
+
+  .jasa-section,
+  .teknisi-section {
+    width: 100%;
+  }
+
+  .laporan-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

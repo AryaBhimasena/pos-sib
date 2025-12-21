@@ -1,208 +1,84 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useServiceModal } from "@/lib/useServiceModal";
+import { useEffect, useState } from "react";
 import { postAPI } from "@/lib/api";
-import Swal from "sweetalert2";
-
-/* helper format rupiah */
-const formatRupiah = (value) => {
-  const number = value.replace(/\D/g, "");
-  return number.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-};
 
 export default function ServiceModal({ open, onClose }) {
-  const abortRef = useRef(null);
+  const {
+    form,
+    setForm,
 
-  const [form, setForm] = useState({
-    nota: "",
-    tanggalTerima: "",
-    estimasiSelesai: "",
-    estimasiBiaya: "",
-    pelanggan: "",
-    hp: "",
-    merek: "",
-    tipe: "",
-    keluhan: "",
-    teknisi: "Agus",
-  });
+    merekList,
+    teknisiList,
 
-  /* ================= COMBOBOX STATE ================= */
-  const [namaList, setNamaList] = useState([]);
-  const [hpList, setHpList] = useState([]);
-  const [showNama, setShowNama] = useState(false);
-  const [showHp, setShowHp] = useState(false);
-  const [activeNama, setActiveNama] = useState(-1);
-  const [activeHp, setActiveHp] = useState(-1);
+    namaList,
+    hpList,
+    showNama,
+    showHp,
+    activeNama,
+    activeHp,
 
-  /* ================= PELANGGAN BARU ================= */
-  const [isNewCustomer, setIsNewCustomer] = useState(false);
+    isNewCustomer,
+    setIsNewCustomer,
 
-  /* ================= INIT: GENERATE NOTA ================= */
+    handleChange,
+    handleBiayaChange,
+    handlePelangganChange,
+    handleNamaKeyDown,
+    handleHpChange,
+    handleSubmit,
+
+    setShowNama,
+    setShowHp,
+    setActiveNama,
+    setActiveHp,
+  } = useServiceModal(open, onClose);
+
+  /* ================= PART DIGUNAKAN (UI ONLY) ================= */
+  const [partQuery, setPartQuery] = useState("");
+  const [usedParts, setUsedParts] = useState([]);
+
+  /* ================= MASTER BARANG ================= */
+  const [barangList, setBarangList] = useState([]);
+  const [barangSearch, setBarangSearch] = useState("");
+  const [filteredBarang, setFilteredBarang] = useState([]);
+  const [selectedBarang, setSelectedBarang] = useState(null);
+  const [showBarang, setShowBarang] = useState(false);
+
+  /* ================= LOAD MASTER BARANG ================= */
   useEffect(() => {
     if (!open) return;
 
-    const controller = new AbortController();
-    abortRef.current = controller;
-
-    const init = async () => {
+    (async () => {
       try {
-        const res = await postAPI("generate-nota", {}, controller.signal);
-        setForm((prev) => ({
-          ...prev,
-          nota: res.data.nota,
-          tanggalTerima: res.data.today,
-        }));
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error("Gagal generate nota", err);
+        const res = await postAPI("barang");
+        if (res.status === "OK") {
+          setBarangList(res.data || []);
         }
+      } catch (err) {
+        console.error("Gagal memuat data barang", err);
       }
-    };
-
-    init();
-    return () => controller.abort();
+    })();
   }, [open]);
 
-  /* ================= FETCH AUTOCOMPLETE ================= */
-  const fetchPelanggan = async (query, by) => {
-    const res = await postAPI("autocomplete-pelanggan", { query, by });
-    return res.data || [];
-  };
-
-  /* ================= HANDLER UMUM ================= */
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleBiayaChange = (e) => {
-    setForm({ ...form, estimasiBiaya: formatRupiah(e.target.value) });
-  };
-
-  /* ================= NAMA PELANGGAN ================= */
-  const handlePelangganChange = async (e) => {
-    const value = e.target.value;
-    setForm((p) => ({ ...p, pelanggan: value }));
-    setShowNama(!!value);
-    setActiveNama(-1);
-
-    if (isNewCustomer || !value) {
-      setNamaList([]);
+  useEffect(() => {
+    if (!barangSearch) {
+      setFilteredBarang([]);
       return;
     }
 
-    const data = await fetchPelanggan(value, "nama");
-    setNamaList(data);
-  };
+    const keyword = barangSearch.toLowerCase();
 
-  const selectNama = (item) => {
-    setForm((p) => ({
-      ...p,
-      pelanggan: item.nama,
-      hp: item.hp,
-    }));
-    setShowNama(false);
-  };
+    const result = barangList.filter((item) =>
+      item.nama?.toLowerCase().includes(keyword) ||
+      item.sku?.toLowerCase().includes(keyword) ||
+      item.id?.toLowerCase().includes(keyword)
+    );
 
-  const handleNamaKeyDown = async (e) => {
-    if (!showNama) return;
+    setFilteredBarang(result.slice(0, 8));
+  }, [barangSearch, barangList]);
 
-    if (e.key === "ArrowDown") {
-      setActiveNama((i) => Math.min(i + 1, namaList.length - 1));
-    }
-
-    if (e.key === "ArrowUp") {
-      setActiveNama((i) => Math.max(i - 1, 0));
-    }
-
-    if (e.key === "Enter") {
-      e.preventDefault();
-
-      if (activeNama >= 0 && namaList[activeNama]) {
-        selectNama(namaList[activeNama]);
-        return;
-      }
-
-      if (!isNewCustomer && form.pelanggan && namaList.length === 0) {
-        const confirm = await Swal.fire({
-          title: "Data tidak ditemukan",
-          text: "Tambahkan pelanggan baru?",
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonText: "Ya",
-          cancelButtonText: "Tidak",
-        });
-
-        if (confirm.isConfirmed) {
-          setIsNewCustomer(true);
-          setShowNama(false);
-        }
-      }
-    }
-  };
-
-  /* ================= NO HP ================= */
-  const handleHpChange = async (e) => {
-    const value = e.target.value;
-    setForm((p) => ({ ...p, hp: value }));
-    setShowHp(true);
-    setActiveHp(-1);
-
-    if (isNewCustomer || !value) {
-      setHpList([]);
-      return;
-    }
-
-    const data = await fetchPelanggan(value, "hp");
-    setHpList(data);
-  };
-
-  const selectHp = (item) => {
-    setForm((p) => ({
-      ...p,
-      pelanggan: item.nama,
-      hp: item.hp,
-    }));
-    setShowHp(false);
-  };
-
-  const handleHpKeyDown = (e) => {
-    if (!showHp) return;
-
-    if (e.key === "ArrowDown") {
-      setActiveHp((i) => Math.min(i + 1, hpList.length - 1));
-    }
-    if (e.key === "ArrowUp") {
-      setActiveHp((i) => Math.max(i - 1, 0));
-    }
-    if (e.key === "Enter" && activeHp >= 0) {
-      selectHp(hpList[activeHp]);
-    }
-  };
-
-  /* ================= SIMPAN ================= */
-  const handleSubmit = async () => {
-    try {
-      await postAPI("create-service", {
-        nota: form.nota,
-        tanggalTerima: form.tanggalTerima,
-        estimasiSelesai: form.estimasiSelesai,
-        estimasiBiaya: Number(form.estimasiBiaya.replace(/\./g, "")),
-        pelanggan: form.pelanggan,
-        hp: form.hp,
-        merek: form.merek,
-        tipe: form.tipe,
-        keluhan: form.keluhan,
-        teknisi: form.teknisi,
-      });
-
-      onClose();
-    } catch (err) {
-      console.error("Gagal simpan service", err);
-      alert("Gagal menyimpan data service");
-    }
-  };
-
-  /* ================= RENDER GUARD ================= */
   if (!open) return null;
 
   return (
@@ -217,9 +93,9 @@ export default function ServiceModal({ open, onClose }) {
 
         {/* ================= CONTENT ================= */}
         <div className="modal-content two-column">
-
-          {/* ================= FORM ================= */}
           <div className="service-form">
+
+            {/* ================= FORM DATA ================= */}
             <div className="form-grid-3">
               <div className="form-group">
                 <label>No Nota</label>
@@ -228,36 +104,57 @@ export default function ServiceModal({ open, onClose }) {
 
               <div className="form-group">
                 <label>Tanggal Terima</label>
-                <input type="date" name="tanggalTerima" value={form.tanggalTerima} onChange={handleChange} />
+                <input
+                  type="date"
+                  name="tanggalTerima"
+                  value={form.tanggalTerima}
+                  onChange={handleChange}
+                />
               </div>
 
               <div className="form-group">
                 <label>Estimasi Selesai</label>
-                <input type="date" name="estimasiSelesai" value={form.estimasiSelesai} onChange={handleChange} />
+                <input
+                  type="date"
+                  name="estimasiSelesai"
+                  value={form.estimasiSelesai}
+                  onChange={handleChange}
+                />
               </div>
             </div>
 
+            {/* ================= BIAYA ================= */}
             <div className="form-grid-biaya">
               <div className="form-group biaya-label">
                 <label>Estimasi Biaya Awal</label>
               </div>
               <div className="form-group biaya-input">
-                <input name="estimasiBiaya" value={form.estimasiBiaya} onChange={handleBiayaChange} />
+                <input
+                  name="estimasiBiaya"
+                  value={form.estimasiBiaya}
+                  onChange={handleBiayaChange}
+                />
                 <small>Masukkan estimasi biaya awal (manual)</small>
               </div>
             </div>
 
+            {/* ================= PELANGGAN ================= */}
             <div className="form-section">
               <div className="form-section-header">
                 <h4>Informasi Pelanggan</h4>
-
                 <label className="pelanggan-baru">
-                  <input type="checkbox" checked={isNewCustomer} onChange={(e) => setIsNewCustomer(e.target.checked)} />
+                  <input
+                    type="checkbox"
+                    checked={isNewCustomer}
+                    onChange={(e) => setIsNewCustomer(e.target.checked)}
+                  />
                   <span>Pelanggan Baru</span>
                 </label>
               </div>
 
               <div className="form-grid-2">
+
+                {/* ===== NAMA ===== */}
                 <div className="form-group combobox">
                   <label>Nama Pelanggan</label>
                   <input
@@ -270,7 +167,18 @@ export default function ServiceModal({ open, onClose }) {
                   {showNama && namaList.length > 0 && (
                     <ul className="combo-list">
                       {namaList.map((item, i) => (
-                        <li key={i} className={i === activeNama ? "active" : ""} onMouseDown={() => selectNama(item)}>
+                        <li
+                          key={item.hp || i}
+                          className={i === activeNama ? "active" : ""}
+                          onMouseDown={() => {
+                            setForm((p) => ({
+                              ...p,
+                              pelanggan: item.nama,
+                              hp: item.hp,
+                            }));
+                            setShowNama(false);
+                          }}
+                        >
                           {item.nama}
                         </li>
                       ))}
@@ -278,19 +186,46 @@ export default function ServiceModal({ open, onClose }) {
                   )}
                 </div>
 
+                {/* ===== HP ===== */}
                 <div className="form-group combobox">
                   <label>No HP</label>
                   <input
                     name="hp"
                     value={form.hp}
                     onChange={handleHpChange}
-                    onKeyDown={handleHpKeyDown}
+                    onKeyDown={(e) => {
+                      if (!showHp) return;
+                      if (e.key === "ArrowDown")
+                        setActiveHp((i) => Math.min(i + 1, hpList.length - 1));
+                      if (e.key === "ArrowUp")
+                        setActiveHp((i) => Math.max(i - 1, 0));
+                      if (e.key === "Enter" && activeHp >= 0) {
+                        const item = hpList[activeHp];
+                        setForm((p) => ({
+                          ...p,
+                          pelanggan: item.nama,
+                          hp: item.hp,
+                        }));
+                        setShowHp(false);
+                      }
+                    }}
                     onFocus={() => setShowHp(true)}
                   />
                   {showHp && hpList.length > 0 && (
                     <ul className="combo-list">
                       {hpList.map((item, i) => (
-                        <li key={i} className={i === activeHp ? "active" : ""} onMouseDown={() => selectHp(item)}>
+                        <li
+                          key={item.hp || i}
+                          className={i === activeHp ? "active" : ""}
+                          onMouseDown={() => {
+                            setForm((p) => ({
+                              ...p,
+                              pelanggan: item.nama,
+                              hp: item.hp,
+                            }));
+                            setShowHp(false);
+                          }}
+                        >
                           {item.hp}
                         </li>
                       ))}
@@ -298,22 +233,31 @@ export default function ServiceModal({ open, onClose }) {
                   )}
                 </div>
 
+                {/* ===== MEREK ===== */}
                 <div className="form-group">
                   <label>Merek HP</label>
-                  <select name="merek" value={form.merek} onChange={handleChange}>
+                  <select
+                    name="merek"
+                    value={form.merek}
+                    onChange={handleChange}
+                  >
                     <option value="">Pilih Merek</option>
-                    <option>Samsung</option>
-                    <option>Apple</option>
-                    <option>Xiaomi</option>
-                    <option>Oppo</option>
-                    <option>Vivo</option>
-                    <option>Realme</option>
+                    {merekList.map((m, i) => (
+                      <option key={m.id || i} value={m.nama}>
+                        {m.nama}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
+                {/* ===== TIPE ===== */}
                 <div className="form-group">
                   <label>Tipe HP</label>
-                  <select name="tipe" value={form.tipe} onChange={handleChange}>
+                  <select
+                    name="tipe"
+                    value={form.tipe}
+                    onChange={handleChange}
+                  >
                     <option value="">Pilih Tipe</option>
                     <option>Entry Level</option>
                     <option>Mid Range</option>
@@ -324,12 +268,140 @@ export default function ServiceModal({ open, onClose }) {
 
               <div className="form-group">
                 <label>Keluhan / Kerusakan</label>
-                <textarea name="keluhan" value={form.keluhan} onChange={handleChange} />
+                <textarea
+                  name="keluhan"
+                  value={form.keluhan}
+                  onChange={handleChange}
+                />
               </div>
             </div>
+
+            {/* ================= PART DIGUNAKAN ================= */}
+            <div className="form-section">
+              <div className="form-section-header">
+                <h4>Part Digunakan</h4>
+                <span className="muted">
+                  Dicatat sebelum nota disimpan (stok belum berkurang)
+                </span>
+              </div>
+
+              <div className="form-grid-3">
+                <div className="form-group combobox span-2">
+                  <label>Cari Part</label>
+                  <input
+                    placeholder="Cari nama part / SKU"
+                    value={barangSearch}
+                    onChange={(e) => {
+                      setBarangSearch(e.target.value);
+                      setSelectedBarang(null);
+                      setShowBarang(true);
+                    }}
+                    onFocus={() => setShowBarang(true)}
+                  />
+
+                  {showBarang && filteredBarang.length > 0 && (
+                    <ul className="combo-list">
+                      {filteredBarang.map((item, i) => (
+                        <li
+                          key={item.id || i}
+                          onMouseDown={() => {
+                            setSelectedBarang(item);
+                            setBarangSearch(item.nama);
+                            setShowBarang(false);
+                          }}
+                        >
+                          <strong>{item.nama}</strong>
+                          <br />
+                          <small>{item.sku}</small>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label>&nbsp;</label>
+                  <button
+                    type="button"
+                    className="btn secondary full"
+                    disabled={!selectedBarang}
+                    onClick={() => {
+                      if (!selectedBarang) return;
+
+                      setUsedParts((prev) => [
+                        ...prev,
+                        {
+                          id: selectedBarang.id,
+                          nama: selectedBarang.nama,
+                          qty: 1,
+                        },
+                      ]);
+
+                      setSelectedBarang(null);
+                      setBarangSearch("");
+                    }}
+                  >
+                    + Tambah
+                  </button>
+                </div>
+              </div>
+
+              {usedParts.length > 0 && (
+                <table className="dashboard-table compact">
+                  <thead>
+                    <tr>
+                      <th>Nama Part</th>
+                      <th style={{ width: 100 }}>Qty</th>
+                      <th style={{ width: 60 }}>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {usedParts.map((p) => (
+                      <tr key={p.id}>
+                        <td>{p.nama}</td>
+                        <td>
+                          <input
+                            type="number"
+                            min="1"
+                            value={p.qty}
+                            onChange={(e) =>
+                              setUsedParts((list) =>
+                                list.map((x) =>
+                                  x.id === p.id
+                                    ? { ...x, qty: Number(e.target.value) || 1 }
+                                    : x
+                                )
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="text-center">
+                          <button
+                            className="icon-btn danger"
+                            title="Hapus"
+                            onClick={() =>
+                              setUsedParts((list) =>
+                                list.filter((x) => x.id !== p.id)
+                              )
+                            }
+                          >
+                            🗑
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {usedParts.length === 0 && (
+                <p className="muted small">Belum ada part yang digunakan</p>
+              )}
+            </div>
+
           </div>
 
-          {/* ================= LIVE PREVIEW NOTA ================= */}
+          {/* ================= PREVIEW ================= */}
           <div className="service-preview landscape">
             <div className="nota-landscape">
               <div className="nota-kop">
@@ -380,10 +452,16 @@ export default function ServiceModal({ open, onClose }) {
           <div className="footer-actions full">
             <div className="footer-group">
               <label>Pilih Teknisi</label>
-              <select name="teknisi" value={form.teknisi} onChange={handleChange}>
-                <option>Agus</option>
-                <option>Doni</option>
-                <option>Rizal</option>
+              <select
+                name="teknisi"
+                value={form.teknisi}
+                onChange={handleChange}
+              >
+                {teknisiList.map((t, i) => (
+                  <option key={t.id || i} value={t.nama}>
+                    {t.nama}
+                  </option>
+                ))}
               </select>
             </div>
 

@@ -1,0 +1,60 @@
+/* ================================================= */
+/* DATA PELANGGAN - FILTER */
+/* ================================================= */
+
+.pelanggan-filter {
+  max-width: 360px;
+}
+
+.pelanggan-filter input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.pelanggan-filter input::placeholder {
+  color: #9ca3af;
+}
+
+.pelanggan-filter input:focus {
+  outline: none;
+  border-color: #111827;
+}
+
+/* ================================================= */
+/* TABLE ACTION BUTTONS */
+/* (mengikuti pola Data Barang) */
+/* ================================================= */
+
+.table-actions {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: #f2f4f7;
+  color: #000;
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}

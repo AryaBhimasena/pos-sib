@@ -1,0 +1,39 @@
+/* ================================================= */
+/* DATA SUPPLIER - FILTER */
+/* ================================================= */
+
+.supplier-filter {
+  display: flex;
+  gap: 12px;
+  max-width: 520px;
+}
+
+.supplier-filter input,
+.supplier-filter select {
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.supplier-filter input {
+  flex: 1;
+}
+
+.supplier-filter input:focus,
+.supplier-filter select:focus {
+  outline: none;
+  border-color: #111827;
+}
+
+/* ================================================= */
+/* UTIL */
+/* ================================================= */
+
+.truncate {
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

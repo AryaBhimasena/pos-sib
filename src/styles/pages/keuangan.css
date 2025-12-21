@@ -1,0 +1,56 @@
+.keuangan-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 18px;
+}
+
+.tab-btn {
+  position: relative;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 10px 10px 0 0;
+  transition: all 0.15s ease;
+}
+
+.tab-btn:hover {
+  color: #111827;
+  background: #f9fafb;
+}
+
+.tab-btn.active {
+  color: #111827;
+  background: #ffffff;
+}
+
+.tab-btn.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: #111827;
+  border-radius: 2px;
+}
+
+.keuangan-tab-body {
+  padding-top: 10px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

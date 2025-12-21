@@ -1,0 +1,74 @@
+Folder PATH listing
+Volume serial number is E2A3-DDD3
+C:.
+|   .gitignore
+|   eslint.config.mjs
+|   jsconfig.json
+|   next.config.mjs
+|   package-lock.json
+|   package.json
+|   postcss.config.js
+|   README.md
+|   StrukturFolder.txt
+|   tailwind.config.js
+|   
+\---src
+    +---app
+    |   |   favicon.ico
+    |   |   globals.css
+    |   |   layout.js
+    |   |   page.js
+    |   |   page.module.css
+    |   |   
+    |   +---keuangan
+    |   |       page.js
+    |   |       
+    |   +---laporan
+    |   |       page.js
+    |   |       
+    |   +---master
+    |   |       page.js
+    |   |       
+    |   +---penjualan
+    |   |       page.js
+    |   |       
+    |   \---service
+    |           page.js
+    |           
+    +---components
+    |   |   BarangTab.js
+    |   |   ContainerCard.js
+    |   |   Header.js
+    |   |   PelangganTab.js
+    |   |   ServiceModal.js
+    |   |   Sidebar.js
+    |   |   SupplierTab.js
+    |   |   
+    |   \---keuangan
+    |           HutangSupplierTab.js
+    |           LedgerKeuanganTab.js
+    |           PembayaranTekhnisiTab.js
+    |           
+    +---lib
+    |       api.js
+    |       barangService.js
+    |       
+    \---styles
+        |   card.css
+        |   components.css
+        |   global.css
+        |   header.css
+        |   layout.css
+        |   sidebar.css
+        |   
+        \---pages
+                dataBarang.css
+                keuangan.css
+                laporan.css
+                master.css
+                pelanggan.css
+                pembayaran-tekhnisi.css
+                penjualan.css
+                service.css
+                supplier.css
+                

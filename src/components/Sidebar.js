@@ -1,6 +1,15 @@
-import "../styles/components.css";
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import "@/styles/sidebar.css";
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
+  const isActive = (path) =>
+    pathname === path || pathname.startsWith(path + "/");
+
   return (
     <aside className="sidebar">
       {/* BRAND */}
@@ -14,33 +23,48 @@ export default function Sidebar() {
 
       {/* MENU */}
       <nav className="sidebar-menu">
-        <div className="menu-item active">Dashboard</div>
+        <Link
+          href="/"
+          className={`menu-item ${isActive("/") ? "active" : ""}`}
+        >
+          Dashboard
+        </Link>
 
-        <div className="menu-section">
-          <div className="menu-parent">Transaksi</div>
-          <div className="menu-group">
-            <div className="menu-child">Service</div>
-            <div className="menu-child">Penjualan</div>
-          </div>
-        </div>
+        <Link
+          href="/service"
+          className={`menu-item ${isActive("/service") ? "active" : ""}`}
+        >
+          Service
+        </Link>
 
-        <div className="menu-section">
-          <div className="menu-parent">Inventori</div>
-          <div className="menu-group">
-            <div className="menu-child">Mutasi Stok</div>
-          </div>
-        </div>
+        <Link
+          href="/penjualan"
+          className={`menu-item ${isActive("/penjualan") ? "active" : ""}`}
+        >
+          Penjualan
+        </Link>
 
-        <div className="menu-item">Laporan</div>
+        {/* ===== MENU BARU: KEUANGAN ===== */}
+        <Link
+          href="/keuangan"
+          className={`menu-item ${isActive("/keuangan") ? "active" : ""}`}
+        >
+          Keuangan
+        </Link>
 
-        <div className="menu-section">
-          <div className="menu-parent">Master Data</div>
-          <div className="menu-group">
-            <div className="menu-child">Data Pelanggan</div>
-            <div className="menu-child">Data Barang</div>
-            <div className="menu-child">Data Supplier</div>
-          </div>
-        </div>
+        <Link
+          href="/laporan"
+          className={`menu-item ${isActive("/laporan") ? "active" : ""}`}
+        >
+          Laporan
+        </Link>
+
+        <Link
+          href="/master"
+          className={`menu-item ${isActive("/master") ? "active" : ""}`}
+        >
+          Master Data
+        </Link>
       </nav>
 
       {/* FOOTER */}

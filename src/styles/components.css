@@ -33,202 +33,6 @@ body {
   padding: 24px;
 }
 
-/* ===============================
-   SIDEBAR
-================================ */
-.sidebar {
-  width: 260px;
-  height: 100vh;
-  background: #ffffff;
-  border-right: 1px solid #e5e7eb;
-  display: flex;
-  flex-direction: column;
-  font-family: system-ui, -apple-system, sans-serif;
-}
-
-/* ===============================
-   BRAND
-================================ */
-.sidebar-brand {
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.sidebar-logo {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  background: #2563eb;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.sidebar-store {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-  line-height: 1.2;
-}
-
-.sidebar-store span {
-  display: block;
-  font-size: 11px;
-  font-weight: 400;
-  color: #6b7280;
-}
-
-/* ===============================
-   MENU
-================================ */
-.sidebar-menu {
-  flex: 1;
-  padding: 16px 12px;
-  overflow-y: auto;
-}
-
-.menu-item {
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #374151;
-  cursor: pointer;
-  margin-bottom: 4px;
-}
-
-.menu-item:hover {
-  background: #f3f4f6;
-}
-
-.menu-item.active {
-  background: #eef2ff;
-  color: #1d4ed8;
-  font-weight: 500;
-}
-
-/* SECTION */
-.menu-section {
-  margin-bottom: 14px;
-}
-
-.menu-parent {
-  font-size: 12px;
-  font-weight: 600;
-  color: #6b7280;
-  padding: 6px 14px;
-  text-transform: uppercase;
-}
-
-.menu-group {
-  margin-top: 4px;
-}
-
-.menu-child {
-  padding: 8px 14px 8px 28px;
-  font-size: 13px;
-  color: #374151;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.menu-child:hover {
-  background: #f3f4f6;
-}
-
-/* ===============================
-   FOOTER
-================================ */
-.sidebar-footer {
-  padding: 12px;
-  border-top: 1px solid #f1f5f9;
-}
-
-.sidebar-logout {
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #dc2626;
-  cursor: pointer;
-}
-
-.sidebar-logout:hover {
-  background: #fef2f2;
-}
-
-
-/* =====================================================
-   HEADER (GLOBAL APP HEADER)
-===================================================== */
-
-.app-header {
-  height: 52px;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* LEFT */
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.header-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #2563eb;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.header-user {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-
-.header-user .greeting {
-  font-size: 11px;
-  color: #6b7280;
-}
-
-.header-user .username {
-  font-size: 13px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.header-user .role {
-  font-size: 11px;
-  color: #9ca3af;
-}
-
-/* RIGHT */
-.header-right {
-  display: flex;
-  align-items: center;
-}
-
-.header-datetime {
-  font-size: 12px;
-  color: #6b7280;
-}
-
 
 /* ===================================================== */
 /* CONTAINER CARD */
@@ -293,6 +97,92 @@ body {
 
 .form-section-header h4 {
   margin: 0;
+}
+
+/* ================= PART DIGUNAKAN ================= */
+
+/* Judul + info kecil */
+.form-section .muted {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.form-section .small {
+  font-size: 12px;
+}
+
+/* Input qty di tabel */
+.dashboard-table.compact input[type="number"] {
+  width: 70px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  text-align: center;
+  font-size: 13px;
+}
+
+/* Tabel part */
+.dashboard-table.compact {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.dashboard-table.compact thead th {
+  text-align: left;
+  font-size: 12px;
+  color: #6b7280;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.dashboard-table.compact tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+/* Center kolom aksi */
+.dashboard-table.compact .text-center {
+  text-align: center;
+}
+
+/* Tombol icon hapus */
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.icon-btn:hover {
+  background: #f1f5f9;
+}
+
+.icon-btn.danger {
+  color: #dc2626;
+}
+
+.icon-btn.danger:hover {
+  background: #fee2e2;
+}
+
+/* Tombol tambah full */
+.btn.full {
+  width: 100%;
+}
+
+/* Grid khusus search part */
+.form-grid-3 .span-2 {
+  grid-column: span 2;
 }
 
 /* Checkbox pelanggan baru */
