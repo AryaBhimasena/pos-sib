@@ -1,3 +1,8 @@
+/* ======================================================
+   PAGE SERVICE
+   Lokasi: app/service/page.js
+====================================================== */
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -17,18 +22,15 @@ export default function TransaksiServicePage() {
   const [statusBayar, setStatusBayar] = useState("");
 
   const fetchData = async () => {
-    const res = await postAPI({
-      action: "apiGetTransaksiService",
-      bulan,
-    });
+    try {
+      const json = await postAPI("apiGetTransaksiService");
 
-    const rows = Array.isArray(res?.data)
-      ? res.data
-      : Array.isArray(res?.data?.data)
-      ? res.data.data
-      : [];
-
-    setList(rows);
+      if (json.status === "OK") {
+        setList(Array.isArray(json.data) ? json.data : []);
+      }
+    } catch (err) {
+      console.error("FETCH SERVICE ERROR:", err);
+    }
   };
 
   useEffect(() => {
@@ -52,8 +54,8 @@ export default function TransaksiServicePage() {
   const summary = useMemo(() => {
     return {
       total: filtered.length,
-      selesai: filtered.filter(r => r.statusService === "Selesai").length,
-      belumBayar: filtered.filter(r => r.statusBayar !== "Lunas").length,
+      selesai: filtered.filter(r => r.statusService === "SELESAI").length,
+      belumBayar: filtered.filter(r => r.statusBayar !== "LUNAS").length,
       omzet: filtered.reduce((a, b) => a + (b.grandTotal || 0), 0),
     };
   }, [filtered]);
@@ -106,17 +108,23 @@ export default function TransaksiServicePage() {
           onChange={e => setSearch(e.target.value)}
         />
 
-        <select value={statusService} onChange={e => setStatusService(e.target.value)}>
+        <select
+          value={statusService}
+          onChange={e => setStatusService(e.target.value)}
+        >
           <option value="">Semua Status</option>
-          <option value="Diterima">Diterima</option>
-          <option value="Diproses">Diproses</option>
-          <option value="Selesai">Selesai</option>
+          <option value="DITERIMA">Diterima</option>
+          <option value="DIPROSES">Diproses</option>
+          <option value="SELESAI">Selesai</option>
         </select>
 
-        <select value={statusBayar} onChange={e => setStatusBayar(e.target.value)}>
+        <select
+          value={statusBayar}
+          onChange={e => setStatusBayar(e.target.value)}
+        >
           <option value="">Semua Pembayaran</option>
-          <option value="Lunas">Lunas</option>
-          <option value="Belum Lunas">Belum Lunas</option>
+          <option value="LUNAS">Lunas</option>
+          <option value="BELUM LUNAS">Belum Lunas</option>
         </select>
       </div>
 
@@ -138,7 +146,9 @@ export default function TransaksiServicePage() {
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan="7" className="empty">Tidak ada data</td>
+                <td colSpan="7" className="empty">
+                  Tidak ada data
+                </td>
               </tr>
             )}
 

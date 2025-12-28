@@ -1,6 +1,6 @@
-Folder PATH listing
-Volume serial number is E2A3-DDD3
-C:.
+Folder PATH listing for volume New Volume
+Volume serial number is B830-253F
+D:.
 |   .gitignore
 |   eslint.config.mjs
 |   jsconfig.json
@@ -12,6 +12,13 @@ C:.
 |   StrukturFolder.txt
 |   tailwind.config.js
 |   
++---public
+|       file.svg
+|       globe.svg
+|       next.svg
+|       vercel.svg
+|       window.svg
+|       
 \---src
     +---app
     |   |   favicon.ico
@@ -52,6 +59,8 @@ C:.
     +---lib
     |       api.js
     |       barangService.js
+    |       serviceModalHelper.js
+    |       useServiceModal.js
     |       
     \---styles
         |   card.css
@@ -71,4 +80,3 @@ C:.
                 penjualan.css
                 service.css
                 supplier.css
-                

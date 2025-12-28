@@ -157,6 +157,93 @@
   color: #6b7280;
 }
 
+/* ===============================
+   QUICK SEARCH BARANG (COMBOBOX)
+================================ */
+
+/* Pastikan container relatif agar dropdown absolut */
+.reminder.due {
+  position: relative;
+}
+
+/* SEARCH INPUT */
+.reminder.due input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.reminder.due input[type="text"]::placeholder {
+  color: #9ca3af;
+}
+
+.reminder.due input[type="text"]:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* DROPDOWN SEARCH RESULT */
+.dropdown-search {
+  position: absolute;
+  top: 78px; /* tepat di bawah input */
+  left: 16px;
+  right: 16px;
+  z-index: 50;
+
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+/* ITEM DROPDOWN */
+.dropdown-search li {
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.dropdown-search li strong {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 500;
+}
+
+.dropdown-search li small {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.dropdown-search li:hover {
+  background: #f3f4f6;
+}
+
+/* SCROLLBAR HALUS */
+.dropdown-search::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown-search::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 6px;
+}
+
+.dropdown-search::-webkit-scrollbar-track {
+  background: transparent;
+}
 
 /* ================= TABLE ================= */
 

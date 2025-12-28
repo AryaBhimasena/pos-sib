@@ -76,18 +76,37 @@ body {
   justify-content: space-between;
 }
 
+/* ================= CONTENT LAYOUT ================= */
+
 .modal-content.two-column {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
   gap: 20px;
   padding: 18px;
-  overflow: auto;
+  overflow: hidden; /* penting: scroll dikunci di form */
 }
 
-/* ================= FORM ================= */
+/* ================= SERVICE FORM (SCROLL AREA) ================= */
+
+.service-form {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(92vh - 160px);
+  padding-right: 6px;
+}
+
+/* ================= PREVIEW (STICKY) ================= */
+
+.service-preview {
+  position: sticky;
+  top: 18px;
+  align-self: flex-start;
+}
+
 /* ===============================
    FORM SECTION HEADER
 ================================ */
+
 .form-section-header {
   display: flex;
   align-items: center;
@@ -97,6 +116,142 @@ body {
 
 .form-section-header h4 {
   margin: 0;
+}
+
+/* ================= FORM SECTION ================= */
+
+.form-section {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed #e5e7eb;
+}
+
+.form-section h4 {
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: #111827;
+}
+
+/* ================= DATA NOTA ================= */
+
+/* Grid 2 kolom untuk data nota */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Estimasi biaya dibuat seperti komposisi total biaya */
+.form-grid-biaya {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.form-grid-biaya .biaya-input input {
+  font-weight: 600;
+  background: #eef2ff;
+  border: 1.5px solid #6366f1;
+  color: #1e3a8a;
+}
+
+/* ================= TOTAL BIAYA SERVICE (SCOPED) ================= */
+
+.form-section.total-biaya {
+  margin-top: 18px;
+}
+
+.form-section.total-biaya h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+/* Card khusus total biaya */
+.form-section.total-biaya .form-grid-3 {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  gap: 10px;
+}
+
+/* Label lebih tenang */
+.form-section.total-biaya .form-group label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* Input KHUSUS total biaya */
+.form-section.total-biaya .form-group input,
+.form-section.total-biaya .form-group select {
+  height: 36px;
+  font-size: 13px;
+  padding: 0 10px;
+  border-radius: 6px;
+}
+
+/* Angka kanan */
+.form-section.total-biaya input {
+  text-align: right;
+}
+
+/* Disabled input */
+.form-section.total-biaya input[disabled] {
+  background: #f3f4f6;
+  font-weight: 600;
+  border-style: dashed;
+}
+
+/* Keterangan kecil */
+.form-section.total-biaya small {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* TOTAL FINAL */
+.form-section.total-biaya .form-group.full {
+  grid-column: span 3;
+  margin-top: 6px;
+}
+
+.form-section.total-biaya .form-group.full input {
+  height: 44px;
+  font-size: 17px;
+  font-weight: 800;
+  background: #eef2ff;
+  border: 1.5px solid #6366f1;
+  color: #1e3a8a;
+}
+
+
+/* ================= METODE PEMBAYARAN ================= */
+
+.radio-group {
+  display: flex;
+  gap: 20px;
+  margin-top: 6px;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio-group input[type="radio"] {
+  cursor: pointer;
 }
 
 /* ================= PART DIGUNAKAN ================= */
@@ -202,6 +357,7 @@ body {
 /* ===============================
    COMBOBOX (GENERAL)
 ================================ */
+
 .form-group.combobox {
   position: relative;
 }
@@ -209,7 +365,7 @@ body {
 .form-group.combobox input {
   width: 100%;
   background-clip: padding-box;
-  padding-right: 36px; /* ruang untuk chevron */
+  padding-right: 36px;
 }
 
 /* Fokus input combobox */
@@ -247,11 +403,12 @@ body {
   background: #f1f5f9;
 }
 
-/* Active item (keyboard navigation) */
 .combo-list li.active {
   background: #e0e7ff;
   color: #1e3a8a;
 }
+
+/* ================= FORM INPUT ================= */
 
 .service-form label {
   font-size: 12px;
@@ -262,7 +419,7 @@ body {
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 8px 36px 8px 10px; /* kanan diperlebar untuk chevron */
+  padding: 8px 36px 8px 10px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
   appearance: none;
@@ -292,12 +449,6 @@ body {
 .biaya-input input {
   font-weight: 600;
   background: #f9fafb;
-}
-
-.form-section {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px dashed #e5e7eb;
 }
 
 /* ================= NOTA ================= */
@@ -343,6 +494,48 @@ body {
 
 .nota-no {
   text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* JARAK LABEL ↔ NOMOR */
+}
+
+.nota-no span {
+  font-size: 11px;
+  color: #6b7280;
+  letter-spacing: 0.3px;
+}
+
+.nota-no strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ================= NOTA FOOTER ================= */
+
+.nota-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 18px;
+}
+
+.nota-footer > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* JARAK LABEL ↔ NILAI */
+}
+
+.nota-footer label {
+  font-size: 11px;
+  color: #6b7280;
+  letter-spacing: 0.3px;
+}
+
+.nota-footer strong {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
 }
 
 .nota-divider {
@@ -351,7 +544,7 @@ body {
   margin: 12px 0;
 }
 
-/* ================= NOTA GRID — LABEL : VALUE ================= */
+/* ================= NOTA GRID ================= */
 
 .nota-grid {
   display: grid;
@@ -359,26 +552,22 @@ body {
   gap: 6px 20px;
 }
 
-/* Setiap baris jadi grid kecil: label | : | value */
 .nota-grid > div {
   display: grid;
   grid-template-columns: 110px 10px auto;
   align-items: start;
 }
 
-/* Label */
 .nota-grid > div label {
   font-size: 11px;
   color: #6b7280;
   white-space: nowrap;
 }
 
-/* Titik dua konsisten */
 .nota-grid > div label::after {
   content: ":";
 }
 
-/* Value selalu di kolom ke-3 */
 .nota-grid > div span {
   grid-column: 3;
   font-size: 12px;
@@ -393,7 +582,6 @@ body {
   border: none;
 }
 
-/* Label di atas */
 .nota-keluhan label {
   display: block;
   margin-bottom: 6px;
@@ -401,7 +589,6 @@ body {
   color: #6b7280;
 }
 
-/* Box seperti textarea */
 .nota-keluhan p {
   min-height: 70px;
   padding: 8px 10px;
@@ -410,20 +597,6 @@ body {
   font-size: 12px;
   white-space: pre-wrap;
   line-height: 1.4;
-}
-
-.nota-footer {
-  margin-top: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.ttd-box {
-  width: 120px;
-  height: 40px;
-  border: 1px dashed #d1d5db;
-  margin-top: 4px;
 }
 
 /* ================= FOOTER ================= */
@@ -436,16 +609,26 @@ body {
 .footer-actions.full {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .footer-group {
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: 8px;
-  margin-left: auto;
-  margin-right: 0;
 }
 
 .footer-group select {
