@@ -1,0 +1,53 @@
+/* ======================================================
+   PETTY CASH MODAL
+====================================================== */
+
+.petty-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.petty-modal-container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.petty-modal-container h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.petty-modal-date {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 14px;
+}
+
+.petty-modal-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 16px;
+}
+
+.petty-modal-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+.petty-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

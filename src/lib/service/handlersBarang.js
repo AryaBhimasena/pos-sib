@@ -1,3 +1,8 @@
+/* ======================================================
+   HANDLERSBARANG
+   Lokasi: lib/service/handlersBarang.js
+====================================================== */
+
 export function useBarangHandlers(state) {
   const handleBarangSearchChange = (e) => {
     state.setBarangSearch(e.target.value);

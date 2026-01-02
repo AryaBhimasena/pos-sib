@@ -3,12 +3,34 @@
 import { useState, useEffect } from "react";
 import ContainerCard from "@/components/ContainerCard";
 import ServiceModal from "@/components/ServiceModal";
-import { postAPI } from "@/lib/api";
+import {
+  fetchDashboardService,
+  fetchDashboardBarang,
+  filterBarang,
+  formatTanggal,
+} from "@/lib/dashboardHelper";
+import PettyCashModal from "@/components/pettyCashModal";
+import SalesModal from "@/components/penjualan/SalesModal";
 
 export default function DashboardPage() {
   const [openService, setOpenService] = useState(false);
   const [serviceList, setServiceList] = useState([]);
   const [serviceByTeknisi, setServiceByTeknisi] = useState([]);
+  const [openSalesModal, setOpenSalesModal] = useState(false);
+
+  // ===============================
+  // STATE UNTUK MODE CREATE / EDIT SERVICE
+  // ===============================
+  const [selectedService, setSelectedService] = useState(null);
+
+  // ===============================
+  // PETTY CASH STATE (HARIAN)
+  // ===============================
+  const [openPettyCash, setOpenPettyCash] = useState(false);
+  const [pettyCashValue, setPettyCashValue] = useState("");
+  const [pettyCashTanggal, setPettyCashTanggal] = useState(
+    new Date().toDateString()
+  );
 
   // KPI STATE
   const [kpiServiceDiterima, setKpiServiceDiterima] = useState(0);
@@ -23,125 +45,47 @@ export default function DashboardPage() {
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    async function fetchService() {
-      try {
-        const json = await postAPI("apiGetTransaksiService");
+    fetchDashboardService({
+      setServiceList,
+      setKpiServiceDiterima,
+      setServiceByTeknisi,
+    });
 
-        if (json.status === "OK") {
-          const diterima = json.data
-            .filter(s => s.statusService === "DITERIMA")
-            .sort((a, b) => {
-              const da = new Date(a.created_at || a.tanggalTerima);
-              const db = new Date(b.created_at || b.tanggalTerima);
-              return db - da;
-            });
-
-          setServiceList(diterima);
-
-          // KPI Service Hari Ini
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-
-          const totalHariIni = diterima.filter(s => {
-            let tgl = null;
-
-            if (s.created_at) tgl = new Date(s.created_at);
-            else if (s.tanggalTerima) tgl = new Date(s.tanggalTerima);
-
-            if (!tgl || isNaN(tgl.getTime())) return false;
-
-            tgl.setHours(0, 0, 0, 0);
-            return tgl.getTime() === today.getTime();
-          }).length;
-
-          setKpiServiceDiterima(totalHariIni);
-
-          // ===============================
-          // REKAP SERVICE PER TEKNISI (BULAN AKTIF)
-          // ===============================
-          const now = new Date();
-          const bulan = now.getMonth();
-          const tahun = now.getFullYear();
-
-          const mapTeknisi = {};
-
-          json.data.forEach(s => {
-            if (!s.teknisi) return;
-
-            const tgl = new Date(s.created_at || s.tanggalTerima);
-            if (isNaN(tgl.getTime())) return;
-
-            if (tgl.getMonth() === bulan && tgl.getFullYear() === tahun) {
-              mapTeknisi[s.teknisi] =
-                (mapTeknisi[s.teknisi] || 0) + 1;
-            }
-          });
-
-          const rekap = Object.entries(mapTeknisi)
-            .map(([nama, total]) => ({ nama, total }))
-            .sort((a, b) => b.total - a.total)
-            .slice(0, 3);
-
-          setServiceByTeknisi(rekap);
-        }
-      } catch (err) {
-        console.error("FETCH SERVICE ERROR:", err);
-      }
-    }
-
-    async function fetchBarang() {
-      try {
-        const res = await postAPI("barang");
-
-        if (res.status === "OK") {
-          const rows = Array.isArray(res.data)
-            ? res.data
-            : Array.isArray(res.data?.data)
-            ? res.data.data
-            : [];
-
-          setBarangList(rows);
-        }
-      } catch (err) {
-        console.error("FETCH BARANG ERROR:", err);
-      }
-    }
-
-    fetchService();
-    fetchBarang();
+    fetchDashboardBarang({
+      setBarangList,
+    });
   }, []);
+
+  // ===============================
+  // RESET PETTY CASH SAAT GANTI TANGGAL
+  // ===============================
+  useEffect(() => {
+    const today = new Date().toDateString();
+
+    if (pettyCashTanggal !== today) {
+      setPettyCashTanggal(today);
+      setPettyCashValue("");
+    }
+  }, [pettyCashTanggal]);
 
   // ===============================
   // FILTER BARANG (UNTUK DROPDOWN)
   // ===============================
-  const filteredBarang = Array.isArray(barangList)
-    ? barangList.filter(item => {
-        if (!searchBarang) return false;
-
-        const keyword = searchBarang.toLowerCase();
-
-        return (
-          item.nama?.toLowerCase().includes(keyword) ||
-          item.sku?.toLowerCase().includes(keyword) ||
-          item.id?.toLowerCase().includes(keyword)
-        );
-      })
-    : [];
+  const filteredBarang = filterBarang(barangList, searchBarang);
 
   // ===============================
-  // FORMAT TANGGAL dd-mm-yyyy
+  // SUBMIT PETTY CASH (LOCAL ONLY)
   // ===============================
-  const formatTanggal = iso => {
-    if (!iso) return "-";
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return "-";
+  function submitPettyCash() {
+    const nominal = Number(pettyCashValue || 0);
+    if (!nominal || nominal <= 0) return;
 
-    const dd = String(d.getDate()).padStart(2, "0");
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const yyyy = d.getFullYear();
+    setKpiKasToko(prev => prev + nominal);
+    setKpiOmzet(prev => prev + nominal);
 
-    return `${dd}-${mm}-${yyyy}`;
-  };
+    setPettyCashValue("");
+    setOpenPettyCash(false);
+  }
 
   return (
     <>
@@ -159,12 +103,26 @@ export default function DashboardPage() {
           <div className="dashboard-actions">
             <button
               className="action primary"
-              onClick={() => setOpenService(true)}
+              onClick={() => {
+                setSelectedService(null);
+                setOpenService(true);
+              }}
             >
               + Service Baru
             </button>
-            <button className="action">
-              + Penjualan
+
+			<button
+			  className="action"
+			  onClick={() => setOpenSalesModal(true)}
+			>
+			  + Penjualan
+			</button>
+
+            <button
+              className="action success"
+              onClick={() => setOpenPettyCash(true)}
+            >
+              + Petty Cash
             </button>
           </div>
         </div>
@@ -315,6 +273,7 @@ export default function DashboardPage() {
           <table className="dashboard-table">
             <thead>
               <tr>
+                <th>Aksi</th>
                 <th>No Nota</th>
                 <th>Pelanggan</th>
                 <th>Perangkat</th>
@@ -327,7 +286,7 @@ export default function DashboardPage() {
             <tbody>
               {serviceList.length === 0 && (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: "center" }}>
+                  <td colSpan="8" style={{ textAlign: "center" }}>
                     Tidak ada service diterima
                   </td>
                 </tr>
@@ -335,6 +294,19 @@ export default function DashboardPage() {
 
               {serviceList.map(s => (
                 <tr key={s.id}>
+                  <td>
+                    <button
+                      className="icon-button"
+                      title="Lihat / Edit Nota"
+                      onClick={() => {
+                        setSelectedService(s); // EDIT MODE
+                        setOpenService(true);
+                      }}
+                    >
+                      ✏️
+                    </button>
+                  </td>
+
                   <td>{s.id}</td>
                   <td>{s.pelanggan}</td>
                   <td>{s.merekHP} {s.typeHP}</td>
@@ -351,13 +323,34 @@ export default function DashboardPage() {
             </tbody>
           </table>
         </div>
-
+		
       </ContainerCard>
+
+      {/* ================================================= */}
+      {/* MODAL PETTY CASH (SIMPLE) */}
+      {/* ================================================= */}
+		<PettyCashModal
+		  open={openPettyCash}
+		  value={pettyCashValue}
+		  onChange={setPettyCashValue}
+		  onClose={() => setOpenPettyCash(false)}
+		  onSubmit={submitPettyCash}
+		/>
 
       <ServiceModal
         open={openService}
-        onClose={() => setOpenService(false)}
+        onClose={() => {
+          setOpenService(false);
+          setSelectedService(null);
+        }}
+        serviceData={selectedService}
+        mode={selectedService ? "edit" : "create"}
       />
+	  
+		<SalesModal
+		  open={openSalesModal}
+		  onClose={() => setOpenSalesModal(false)}
+		/>
     </>
   );
 }

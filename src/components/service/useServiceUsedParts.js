@@ -1,6 +1,11 @@
+/* ======================================================
+   USE SERVICE USED PARTS HOOK
+   Lokasi: components/service/useServiceUsedParts.js
+====================================================== */
+
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { postAPI } from "@/lib/api";
 
 /**
@@ -8,8 +13,17 @@ import { postAPI } from "@/lib/api";
  * - SELURUH LOGIC part digunakan
  * - STATE lama TIDAK diubah
  * - Harga hanya diperkaya saat addPart
+ * - Payload DISIAPKAN untuk:
+ *   tbl_TransaksiServiceBarang
+ *   tbl_Barang (status)
+ *   LedgerKeuangan
+ * - SUPPORT HYDRATE MODE (EDIT)
  */
-export function useServiceUsedParts(open, onChange) {
+export function useServiceUsedParts(
+  open,
+  onChange,
+  initialUsedParts = []
+) {
   /* ================= STATE ================= */
   const [usedParts, setUsedParts] = useState([]);
 
@@ -19,6 +33,8 @@ export function useServiceUsedParts(open, onChange) {
   const [selectedBarang, setSelectedBarang] = useState(null);
   const [showBarang, setShowBarang] = useState(false);
 
+  const hydratedRef = useRef(false);
+
   /* ================= RESET SAAT MODAL DITUTUP ================= */
   useEffect(() => {
     if (!open) {
@@ -27,8 +43,30 @@ export function useServiceUsedParts(open, onChange) {
       setFilteredBarang([]);
       setSelectedBarang(null);
       setShowBarang(false);
+      hydratedRef.current = false;
     }
   }, [open]);
+
+  /* ================= HYDRATE USED PARTS (EDIT MODE) ================= */
+  useEffect(() => {
+    if (!open) return;
+    if (hydratedRef.current) return;
+    if (!Array.isArray(initialUsedParts)) return;
+    if (initialUsedParts.length === 0) return;
+
+    setUsedParts(
+      initialUsedParts.map((p) => ({
+        ...p,
+        qty: Number(p.qty || 1),
+        hargaJual: Number(p.hargaJual || 0),
+        subtotal:
+          Number(p.subtotal) ||
+          Number(p.hargaJual || 0) * Number(p.qty || 1),
+      }))
+    );
+
+    hydratedRef.current = true;
+  }, [open, initialUsedParts]);
 
   /* ================= LOAD MASTER BARANG ================= */
   useEffect(() => {
@@ -46,7 +84,7 @@ export function useServiceUsedParts(open, onChange) {
     })();
   }, [open]);
 
-  /* ================= FILTER BARANG (TIDAK DIUBAH) ================= */
+  /* ================= FILTER BARANG ================= */
   useEffect(() => {
     if (!barangSearch) {
       setFilteredBarang([]);
@@ -76,19 +114,27 @@ export function useServiceUsedParts(open, onChange) {
 
     const hargaJual = Number(selectedBarang.hargaJual) || 0;
     const hargaBeli = Number(selectedBarang.hargaBeli) || 0;
+    const now = new Date().toISOString();
 
     setUsedParts((prev) => [
       ...prev,
       {
+        /* === IDENTITAS BARANG === */
         id: selectedBarang.id,
         nama: selectedBarang.nama,
         sku: selectedBarang.sku,
 
+        /* === NILAI KEUANGAN === */
         hargaBeli,
         hargaJual,
 
+        /* === KETENTUAN BARANG UNIK === */
         qty: 1,
         subtotal: hargaJual * 1,
+
+        /* === TIMESTAMP === */
+        created_at: now,
+        updated_at: now,
       },
     ]);
 
@@ -107,6 +153,7 @@ export function useServiceUsedParts(open, onChange) {
               ...p,
               qty,
               subtotal: p.hargaJual * qty,
+              updated_at: new Date().toISOString(),
             }
           : p
       )

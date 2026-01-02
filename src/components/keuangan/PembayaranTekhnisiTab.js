@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import "@/styles/pages/pembayaran-tekhnisi.css";
+import FormPembayaranTeknisi from "@/components/keuangan/formPembayaranTeknisi";
 
 const dummyTeknisi = [
   {
@@ -20,6 +22,30 @@ const dummyTeknisi = [
 ];
 
 export default function PembayaranTeknisiTab() {
+  const [showForm, setShowForm] = useState(false);
+  const [selectedTeknisi, setSelectedTeknisi] = useState(null);
+
+  const handleOpenForm = teknisi => {
+    if (teknisi.sisa <= 0) return;
+    setSelectedTeknisi(teknisi);
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setSelectedTeknisi(null);
+  };
+
+  const handleSubmitPembayaran = payload => {
+    console.log("Payload pembayaran:", payload);
+
+    // NANTI:
+    // - POST ke endpoint GAS
+    // - update state / refetch data
+
+    handleCloseForm();
+  };
+
   return (
     <div className="tab-content">
       <h3>Pembayaran Teknisi</h3>
@@ -41,7 +67,9 @@ export default function PembayaranTeknisiTab() {
           {dummyTeknisi.map(t => (
             <tr key={t.id}>
               <td>{t.nama}</td>
-              <td className="right">Rp {t.totalHak.toLocaleString("id-ID")}</td>
+              <td className="right">
+                Rp {t.totalHak.toLocaleString("id-ID")}
+              </td>
               <td className="right paid">
                 Rp {t.sudahDibayar.toLocaleString("id-ID")}
               </td>
@@ -49,12 +77,26 @@ export default function PembayaranTeknisiTab() {
                 Rp {t.sisa.toLocaleString("id-ID")}
               </td>
               <td>
-                <button className="action small">Bayar</button>
+                <button
+                  className="action small"
+                  disabled={t.sisa <= 0}
+                  onClick={() => handleOpenForm(t)}
+                >
+                  Bayar
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {showForm && selectedTeknisi && (
+        <FormPembayaranTeknisi
+          teknisi={selectedTeknisi}
+          onClose={handleCloseForm}
+          onSubmit={handleSubmitPembayaran}
+        />
+      )}
     </div>
   );
 }

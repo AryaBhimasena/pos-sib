@@ -14,7 +14,12 @@ import ServiceTotalBiaya from "@/components/service/ServiceTotalBiaya";
 import ServicePaymentMethod from "@/components/service/ServicePaymentMethod";
 import ServiceNotaSection from "@/components/service/ServiceNotaSection";
 
-export default function ServiceModal({ open, onClose }) {
+export default function ServiceModal({
+  open,
+  onClose,
+  serviceData = null,
+  mode = "create",
+}) {
   const {
     form,
     setForm,
@@ -46,7 +51,7 @@ export default function ServiceModal({ open, onClose }) {
     setShowHp,
     setActiveNama,
     setActiveHp,
-  } = useServiceModal(open, onClose);
+  } = useServiceModal(open, onClose, serviceData, mode);
 
   if (!open) return null;
 
@@ -101,6 +106,7 @@ export default function ServiceModal({ open, onClose }) {
               open={open}
               value={usedParts}
               onChange={setUsedParts}
+			  initialUsedParts={usedParts}
             />
 
             {/* TOTAL BIAYA SERVICE */}

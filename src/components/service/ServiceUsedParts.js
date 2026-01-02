@@ -8,7 +8,7 @@ import { useServiceUsedParts } from "./useServiceUsedParts";
  * - PURE UI
  * - SEMUA logic dari hook
  */
-export default function ServiceUsedParts({ open, onChange }) {
+export default function ServiceUsedParts({ open, onChange, initialUsedParts }) {
   const {
     usedParts = [],
     barangSearch = "",
@@ -23,7 +23,11 @@ export default function ServiceUsedParts({ open, onChange }) {
     addPart,
     updateQty,
     removePart,
-  } = useServiceUsedParts(open);
+  } = useServiceUsedParts(
+  open,
+  onChange,
+  initialUsedParts // ⬅️ DATA DARI API getServiceByNota
+);
 
 useEffect(() => {
     if (onChange) onChange(usedParts);

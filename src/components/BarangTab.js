@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import ContainerCard from "@/components/ContainerCard";
 import { postAPI } from "@/lib/api";
 import "@/styles/pages/dataBarang.css";
+import BarangModal from "@/components/BarangModal";
 
 export default function DataBarangPage() {
   const [barangList, setBarangList] = useState([]);
@@ -122,8 +123,9 @@ export default function DataBarangPage() {
                 onChange={(e) => setStatus(e.target.value)}
               >
                 <option value="">Semua Status</option>
-                <option value="AKTIF">AKTIF</option>
-                <option value="NONAKTIF">NONAKTIF</option>
+                <option value="TERSEDIA">TERSEDIA</option>
+                <option value="TERPAKAI">TERPAKAI</option>
+                <option value="TERJUAL">TERJUAL</option>
               </select>
             </div>
           </div>
@@ -168,7 +170,7 @@ export default function DataBarangPage() {
                       Rp {Number(item.hargaJual || 0).toLocaleString("id-ID")}
                     </td>
                     <td>
-                      <span className={`status ${item.status === "AKTIF" ? "success" : "default"}`}>
+                      <span className={`status ${item.status === "TERSEDIA" ? "success" : "default"}`}>
                         {item.status}
                       </span>
                     </td>
@@ -196,28 +198,10 @@ export default function DataBarangPage() {
       </ContainerCard>
 
       {/* ================= MODAL ================= */}
-      {openForm && (
-        <div className="modal-backdrop">
-          <div className="modal-container large">
-            <div className="modal-header">
-              <h3>Tambah Barang</h3>
-              <button onClick={() => setOpenForm(false)}>✕</button>
-            </div>
-
-            <div className="modal-body">
-              <p className="muted">
-                Form akan kita lengkapi setelah endpoint CRUD siap
-              </p>
-            </div>
-
-            <div className="modal-footer">
-              <button className="action" onClick={() => setOpenForm(false)}>
-                Tutup
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <BarangModal
+        open={openForm}
+        onClose={() => setOpenForm(false)}
+      />
     </>
   );
 }

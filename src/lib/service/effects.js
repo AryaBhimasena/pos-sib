@@ -5,14 +5,20 @@
 
 import { useEffect, useRef } from "react";
 import { postAPI } from "@/lib/api";
-import { initServiceModal } from "@/lib/serviceModalHelper";
+import {
+  initServiceModal,
+  hydrateServiceForm,
+} from "@/lib/serviceModalHelper";
 
-export function useServiceEffects(open, state) {
+export function useServiceEffects(open, state, serviceData, mode = "create") {
   const abortRef = useRef(null);
 
-  /* INIT MODAL */
+  /* ======================================================
+     INIT MODAL (CREATE ONLY)
+  ====================================================== */
   useEffect(() => {
     if (!open) return;
+    if (mode !== "create") return;
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -27,11 +33,10 @@ export function useServiceEffects(open, state) {
           tanggalTerima: init.today,
 
           teknisi: init.defaultTeknisi,
-		  idKaryawan: init.defaultTeknisiId,
+          idKaryawan: init.defaultTeknisiId,
           jenisService: init.defaultJenisService,
           persenBagiHasil: init.defaultPersenBagiHasil,
 
-          // default tambahan sesuai state terbaru
           statusService: p.statusService || "DITERIMA",
         }));
 
@@ -46,9 +51,57 @@ export function useServiceEffects(open, state) {
     })();
 
     return () => controller.abort();
-  }, [open]);
+  }, [open, mode]);
 
-  /* LOAD MASTER BARANG */
+  /* ======================================================
+     HYDRATE STATE (EDIT ONLY)
+     - LOAD FULL DATA FROM BACKEND
+  ====================================================== */
+  useEffect(() => {
+    if (!open) return;
+    if (mode !== "edit") return;
+    if (!serviceData) return;
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    (async () => {
+      try {
+        const res = await postAPI(
+          "get-service-by-nota",
+          { nota: serviceData.id || serviceData.nota },
+          controller.signal
+        );
+
+        if (res.status !== "OK") {
+          throw new Error("Gagal memuat data service");
+        }
+
+        hydrateServiceForm(
+          res.data,
+          state.setForm,
+          state.setUsedParts
+        );
+
+        /* LOAD MASTER DATA (EDIT MODE) */
+        const init = await initServiceModal(controller.signal);
+        state.setMerekList(init.merekList);
+        state.setTeknisiList(init.teknisiList);
+        state.setJenisServiceList(init.jenisServiceList);
+
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Hydrate service gagal", err);
+        }
+      }
+    })();
+
+    return () => controller.abort();
+  }, [open, mode, serviceData]);
+
+  /* ======================================================
+     LOAD MASTER BARANG
+  ====================================================== */
   useEffect(() => {
     if (!open) return;
 
@@ -64,7 +117,9 @@ export function useServiceEffects(open, state) {
     })();
   }, [open]);
 
-  /* FILTER BARANG */
+  /* ======================================================
+     FILTER BARANG
+  ====================================================== */
   useEffect(() => {
     if (!state.barangSearch) {
       state.setFilteredBarang([]);

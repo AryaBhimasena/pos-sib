@@ -4,12 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 import ContainerCard from "@/components/ContainerCard";
 import { postAPI } from "@/lib/api";
 import "@/styles/pages/supplier.css";
+import SupplierModal from "@/components/SupplierModal";
+import { supplierAPI } from "@/lib/masterDataHelper";
 
 export default function SupplierTab() {
   const [supplierList, setSupplierList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [openForm, setOpenForm] = useState(false);
+  const handleSuccessCreate = () => {
+  loadSupplier();       // re-fetch data
+};
 
   /* ================= FILTER ================= */
   const [search, setSearch] = useState("");
@@ -55,6 +60,30 @@ export default function SupplierTab() {
       return matchSearch && matchStatus;
     });
   }, [supplierList, search, status]);
+  
+  /* ================= DELETE DATA ================= */
+async function handleDelete(id) {
+  const ok = confirm("Yakin ingin menghapus supplier ini?");
+  if (!ok) return;
+
+  try {
+    setLoading(true);
+    setError("");
+
+    const res = await supplierAPI.delete(id);
+
+    if (res.status !== "OK") {
+      throw new Error(res.message || "Gagal menghapus supplier");
+    }
+
+    await loadSupplier(); // refresh data
+  } catch (err) {
+    console.error(err);
+    setError(err.message || "Terjadi kesalahan saat menghapus");
+  } finally {
+    setLoading(false);
+  }
+}
 
   return (
     <>
@@ -135,10 +164,15 @@ export default function SupplierTab() {
                       </span>
                     </td>
                     <td>
-                      <div className="table-actions">
-                        <button className="icon-btn" title="Detail">👁</button>
-                        <button className="icon-btn" title="Edit">✎</button>
-                      </div>
+<div className="table-actions">
+  <button
+    className="icon-btn danger"
+    title="Hapus"
+    onClick={() => handleDelete(item.id)}
+  >
+    🗑
+  </button>
+</div>
                     </td>
                   </tr>
                 ))}
@@ -158,28 +192,11 @@ export default function SupplierTab() {
       </ContainerCard>
 
       {/* ================= MODAL ================= */}
-      {openForm && (
-        <div className="modal-backdrop">
-          <div className="modal-container">
-            <div className="modal-header">
-              <h3>Tambah Supplier</h3>
-              <button onClick={() => setOpenForm(false)}>✕</button>
-            </div>
-
-            <div className="modal-body">
-              <p className="muted">
-                Form supplier akan diaktifkan setelah validasi CRUD final.
-              </p>
-            </div>
-
-            <div className="modal-footer">
-              <button className="action" onClick={() => setOpenForm(false)}>
-                Tutup
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+		<SupplierModal
+		  open={openForm}
+		  onClose={() => setOpenForm(false)}
+		  onSuccess={handleSuccessCreate}
+		/>
     </>
   );
 }

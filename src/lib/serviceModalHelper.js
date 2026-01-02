@@ -1,6 +1,6 @@
 /* ======================================================
    SERVICE MODAL HELPER
-   Lokasi: lib/serviceModal.helper.js
+   Lokasi: lib/serviceModalHelper.js
 ====================================================== */
 
 import Swal from "sweetalert2";
@@ -16,9 +16,6 @@ export const formatRupiah = (value) => {
 
 /* ======================================================
    INIT DATA
-   - Generate nota
-   - Ambil tanggal aktif
-   - Ambil master merek, teknisi, jenis service
 ====================================================== */
 export const initServiceModal = async (signal) => {
   const [
@@ -70,6 +67,78 @@ export const initServiceModal = async (signal) => {
 };
 
 /* ======================================================
+   HYDRATE FORM (EDIT MODE)
+====================================================== */
+export const hydrateServiceForm = (
+  data,
+  setForm,
+  setUsedParts
+) => {
+  if (!data) return;
+
+  const { form, usedParts } = data;
+
+  const normalizeDate = (v) =>
+    v ? String(v).split("T")[0] : "";
+
+  setForm((p) => ({
+    ...p,
+
+    /* NOTA */
+    nota: form.nota,
+    jenisService: form.jenisService,
+
+    /* TANGGAL */
+    tanggalTerima: normalizeDate(form.tanggalTerima),
+    estimasiSelesai: normalizeDate(form.estimasiSelesai),
+    estimasiBiaya: String(form.estimasiBiaya || ""),
+
+    /* PELANGGAN */
+    pelanggan: form.pelanggan,
+    hp: form.hp,
+
+    /* PERANGKAT */
+    merek: form.merek || "",
+    idMerekHP: form.idMerekHP,
+    tipe: form.tipe,
+    keluhan: form.keluhan,
+
+    /* BIAYA */
+    jasaToko: String(form.jasaToko || ""),
+    persenBagiHasil: Number(form.persenBagiHasil || 0),
+
+    totalBarang: Number(form.totalBarang || 0),
+    grandTotal: Number(form.grandTotal || 0),
+
+    totalBiaya: "",
+
+    /* PEMBAYARAN */
+    metodePembayaran: form.metodePembayaran,
+    statusBayar: form.statusBayar,
+    tanggalBayar: normalizeDate(form.tanggalBayar),
+
+    /* TEKNISI */
+    teknisi: form.teknisi,
+    idKaryawan: form.idKaryawan,
+
+    /* STATUS */
+    statusService: form.statusService,
+  }));
+
+  setUsedParts(
+    Array.isArray(usedParts)
+      ? usedParts.map((p) => ({
+          uuid: p.uuid,
+          id: p.id || p.idBarang,
+          nama: p.nama,
+          hargaJual: Number(p.hargaJual || 0),
+          status: p.status || "used",
+        }))
+      : []
+  );
+};
+
+/* ======================================================
    AUTOCOMPLETE PELANGGAN
 ====================================================== */
 export const fetchPelanggan = async (query, by) => {
@@ -82,25 +151,20 @@ export const fetchPelanggan = async (query, by) => {
 ====================================================== */
 export const submitService = async (form, usedParts = []) => {
   return postAPI("create-service", {
-    /* ================= HEADER SERVICE ================= */
     nota: form.nota,
     tanggalTerima: form.tanggalTerima,
     estimasiSelesai: form.estimasiSelesai,
 
-    /* ================= PELANGGAN ================= */
     pelanggan: form.pelanggan,
     hp: form.hp,
 
-    /* ================= PERANGKAT ================= */
     idMerekHP: form.idMerekHP,
     tipe: form.tipe,
     keluhan: form.keluhan,
 
-    /* ================= SERVICE ================= */
     jenisService: form.jenisService,
     statusService: form.statusService || "DITERIMA",
 
-    /* ================= BIAYA ================= */
     estimasiBiaya: Number(
       String(form.estimasiBiaya || "0").replace(/\D/g, "")
     ),
@@ -112,15 +176,12 @@ export const submitService = async (form, usedParts = []) => {
     totalBarang: Number(form.totalBarang || 0),
     grandTotal: Number(form.grandTotal || 0),
 
-    /* ================= SDM ================= */
     idKaryawan: form.idKaryawan,
 
-    /* ================= PEMBAYARAN ================= */
-    metodePembayaran: form.metodePembayaran || form.metodeBayar || "TUNAI",
+    metodePembayaran: form.metodePembayaran || "TUNAI",
     statusBayar: form.statusBayar || "BELUM",
     tanggalBayar: form.tanggalBayar || "",
 
-    /* ================= PART DIGUNAKAN ================= */
     usedParts,
   });
 };

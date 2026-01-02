@@ -4,35 +4,58 @@ import { useEffect, useMemo, useState } from "react";
 import ContainerCard from "@/components/ContainerCard";
 import { postAPI } from "@/lib/api";
 import "@/styles/pages/penjualan.css";
+import SalesModal from "@/components/penjualan/SalesModal";
 
 export default function TransaksiPenjualanPage() {
   const [list, setList] = useState([]);
   const [search, setSearch] = useState("");
   const [statusBayar, setStatusBayar] = useState("");
   const [metodeBayar, setMetodeBayar] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+const [editingData, setEditingData] = useState(null);
 
-  const fetchData = async () => {
-    const res = await postAPI({
-      action: "apiGetTransaksiPenjualan", // tbl_TransaksiPenjualan
-    });
+const handleEdit = row => {
+  setEditingData(row);
+  setOpenModal(true);
+};
 
-    const rows = Array.isArray(res?.data)
-      ? res.data
-      : Array.isArray(res?.data?.data)
-      ? res.data.data
-      : [];
+const fetchData = async () => {
+  const res = await postAPI("apiGetTransaksiPenjualan");
 
-    setList(rows);
-  };
+  if (res?.status !== "OK") {
+    setList([]);
+    return;
+  }
+
+  const rows = Array.isArray(res.data) ? res.data : [];
+
+  const normalized = rows.map(r => ({
+    id: r.ID_Penjualan,
+    tanggal: r.Tanggal,
+    namaPelanggan: r.NamaPelanggan,
+    totalItem: Number(r.TotalItem || 0),
+    totalHarga: Number(r.TotalHarga || 0),
+    metodeBayar: r.MetodeBayar,
+    statusBayar: r.StatusBayar,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  }));
+
+  setList(normalized);
+};
+
+useEffect(() => {
+  fetchData();
+}, []);
   
 const statusClass = {
   "Lunas": "lunas",
   "Belum Lunas": "belum-lunas",
 };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+useEffect(() => {
+  fetchData();
+}, []);
 
   const filtered = useMemo(() => {
     return list.filter(r => {
@@ -48,14 +71,14 @@ const statusClass = {
     });
   }, [list, search, statusBayar, metodeBayar]);
 
-  const summary = useMemo(() => {
-    return {
-      total: filtered.length,
-      lunas: filtered.filter(r => r.statusBayar === "Lunas").length,
-      pending: filtered.filter(r => r.statusBayar !== "Lunas").length,
-      omzet: filtered.reduce((a, b) => a + (b.totalBarang || 0), 0),
-    };
-  }, [filtered]);
+const summary = useMemo(() => {
+  return {
+    total: filtered.length,
+    lunas: filtered.filter(r => r.statusBayar === "Lunas").length,
+    pending: filtered.filter(r => r.statusBayar !== "Lunas").length,
+    omzet: filtered.reduce((a, b) => a + b.totalHarga, 0),
+  };
+}, [filtered]);
 
   return (
     <ContainerCard>
@@ -66,9 +89,21 @@ const statusClass = {
           <p>Transaksi penjualan part dan aksesoris</p>
         </div>
 
-        <button className="action primary">
-          + Penjualan Baru
-        </button>
+<button className="action primary" onClick={() => setOpenModal(true)}>
+  + Penjualan Baru
+</button>
+
+<SalesModal
+  open={openModal}
+  data={editingData}
+  onClose={() => {
+    setOpenModal(false);
+    setEditingData(null);
+    fetchData(); // refresh table setelah simpan
+  }}
+/>
+
+
       </div>
 
       {/* ================= SUMMARY ================= */}
@@ -128,6 +163,7 @@ const statusClass = {
             <th>Metode</th>
             <th>Status</th>
             <th className="right">Total</th>
+			<th>Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -139,22 +175,31 @@ const statusClass = {
             </tr>
           )}
 
-          {filtered.map(row => (
-            <tr key={row.id}>
-              <td>{row.id}</td>
-              <td>{row.tanggal}</td>
-              <td>{row.namaPelanggan || "-"}</td>
-              <td>{row.metodeBayar}</td>
-              <td>
-				<span className={`status ${statusClass[row.statusBayar] || ""}`}>
-				  {row.statusBayar}
-				</span>
-              </td>
-              <td className="right">
-                Rp {Number(row.totalBarang || 0).toLocaleString("id-ID")}
-              </td>
-            </tr>
-          ))}
+{filtered.map(row => (
+  <tr key={row.id}>
+    <td>{row.id}</td>
+    <td>{row.tanggal}</td>
+    <td>{row.namaPelanggan || "-"}</td>
+    <td>{row.metodeBayar}</td>
+    <td>
+      <span className={`status ${statusClass[row.statusBayar] || ""}`}>
+        {row.statusBayar}
+      </span>
+    </td>
+    <td className="right">
+      Rp {row.totalHarga.toLocaleString("id-ID")}
+    </td>
+    <td>
+      <button
+        className="btn small"
+        onClick={() => handleEdit(row)}
+      >
+        Edit
+      </button>
+    </td>
+  </tr>
+))}
+
         </tbody>
       </table>
     </ContainerCard>

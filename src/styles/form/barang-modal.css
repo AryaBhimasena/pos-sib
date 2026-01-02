@@ -1,0 +1,197 @@
+/* ======================================================
+   Barang Modal - Clean Modern Professional
+====================================================== */
+
+/* BACKDROP */
+.barang-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* MODAL CONTAINER */
+.barang-modal {
+  width: 780px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.barang-modal-header {
+  padding: 24px 28px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.barang-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.barang-modal-header p {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Close button */
+.barang-modal-header .close {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+/* BODY */
+.barang-modal-body {
+  padding: 20px 28px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ================= SECTION ================= */
+.section {
+  padding: 20px 20px 22px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+/* SECTION TITLES */
+.section h4 {
+  position: relative;
+  margin: 0;
+  margin-bottom: 18px; /* JARAK DENGAN FIELD PERTAMA */
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 8px;
+  padding-left: 10px;
+}
+
+.section h4::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 3px;
+  height: 14px;
+  background: #2563eb;
+  border-radius: 2px;
+}
+
+/* SECTION HIGHLIGHT (HARGA) */
+.section.highlight {
+  background: linear-gradient(
+    180deg,
+    #f8fafc 0%,
+    #ffffff 100%
+  );
+  border: 1px solid #e5e7eb;
+}
+
+/* LABEL */
+.field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+/* INPUT */
+.field input {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #111827;
+  background: #f9fafb;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.field input::placeholder {
+  color: #9ca3af;
+}
+
+/* GROUPED GRID */
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+.section .grid {
+  row-gap: 18px;
+}
+
+.grid.two {
+  grid-template-columns: 1fr 1fr;
+}
+
+.grid.three {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* FIELD FULL WIDTH SPACING */
+.section > .field {
+  margin-bottom: 16px;
+}
+
+/* FOOTER */
+.barang-modal-footer {
+  padding: 16px 28px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* BUTTONS */
+.btn {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn.ghost {
+  background: #ffffff;
+  color: #374151;
+  border-color: #cbd5e1;
+}
+
+.btn.ghost:hover {
+  background: #f3f4f6;
+}
+
+.btn.primary {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.btn.primary:hover {
+  background: #1d4ed8;
+}
