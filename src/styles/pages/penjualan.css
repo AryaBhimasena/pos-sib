@@ -1,38 +1,82 @@
-/* ================= PENJUALAN ================= */
-
-.transaksi-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 20px;
-}
-
+/* ======================================================
+   GLOBAL
+====================================================== */
 .transaksi-header h2 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .transaksi-header p {
-  margin-top: 4px;
-  font-size: 13px;
+  margin: 4px 0 0;
   color: #6b7280;
+  font-size: 13px;
 }
 
-/* ================= SUMMARY ================= */
+/* ======================================================
+   HEADER
+====================================================== */
+.transaksi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
 
+.action.primary {
+  background: #2563eb;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.action.primary:hover {
+  background: #1d4ed8;
+}
+
+/* ======================================================
+   PERIODE
+====================================================== */
+.transaksi-period {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 13px;
+}
+
+.transaksi-period strong {
+  font-weight: 600;
+}
+
+.transaksi-period input[type="month"] {
+  margin-left: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  background: #fff;
+}
+
+/* ======================================================
+   SUMMARY CARDS
+====================================================== */
 .transaksi-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
 .summary-card {
-  background: #f9fafb;
-  border-radius: 12px;
-  padding: 16px;
+  background: #fff;
   border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 16px;
 }
 
 .summary-card span {
@@ -43,70 +87,92 @@
 .summary-card strong {
   display: block;
   margin-top: 6px;
-  font-size: 18px;
+  font-size: 16px;
+  font-weight: 600;
 }
 
-.summary-card.primary strong { color: #2563eb; }
-.summary-card.success strong { color: #16a34a; }
-.summary-card.warning strong { color: #d97706; }
+/* Card variants */
+.summary-card.success strong {
+  color: #16a34a;
+}
 
-/* ================= FILTER ================= */
+.summary-card.warning strong {
+  color: #ea580c;
+}
 
+.summary-card.info strong {
+  color: #2563eb;
+}
+
+/* ======================================================
+   FILTER TOOLBAR
+====================================================== */
 .transaksi-toolbar {
   display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .transaksi-toolbar input,
 .transaksi-toolbar select {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 8px 10px;
   font-size: 13px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  background: #fff;
 }
 
-/* ================= TABLE ================= */
+.transaksi-toolbar input {
+  flex: 1;
+}
 
+/* ======================================================
+   TABLE
+====================================================== */
 .transaksi-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 13px;
 }
 
-.transaksi-table th {
+.transaksi-table thead th {
   text-align: left;
-  padding: 12px;
+  font-weight: 600;
+  color: #374151;
+  padding: 10px 8px;
   border-bottom: 1px solid #e5e7eb;
-  color: #6b7280;
 }
 
-.transaksi-table td {
-  padding: 12px;
+.transaksi-table tbody td {
+  padding: 12px 8px;
   border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
 }
 
-.transaksi-table td.right {
+.transaksi-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.transaksi-table .right {
   text-align: right;
 }
 
 .transaksi-table .empty {
   text-align: center;
-  padding: 24px;
+  padding: 20px;
   color: #9ca3af;
 }
 
-/* ================= STATUS ================= */
-
+/* ======================================================
+   STATUS BADGE
+====================================================== */
 .status {
+  display: inline-block;
   padding: 4px 10px;
-  border-radius: 999px;
   font-size: 12px;
-}
-
-.status.Lunas {
-  background: #dcfce7;
-  color: #166534;
+  border-radius: 999px;
+  font-weight: 500;
 }
 
 .status.lunas {
@@ -115,6 +181,35 @@
 }
 
 .status.belum-lunas {
-  background: #fef3c7;
-  color: #92400e;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+/* ======================================================
+   ACTION BUTTON
+====================================================== */
+.btn.small {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn.small:hover {
+  background: #e5e7eb;
+}
+
+/* ======================================================
+   RESPONSIVE
+====================================================== */
+@media (max-width: 900px) {
+  .transaksi-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .transaksi-toolbar {
+    flex-direction: column;
+  }
 }

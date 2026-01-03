@@ -1,68 +1,12 @@
-/* =====================================================
- * PENJUALAN MODAL HELPER
- * Path : lib/penjualan/penjualanModalHelper.js
- * ===================================================== */
-
 import { postAPI } from "@/lib/api";
 
 /* =====================================================
- * FORMAT NO NOTA
- * SLS-ddmmyy0001
- * ===================================================== */
-function formatNota(tanggal, urut) {
-  const d = new Date(tanggal);
-
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const yy = String(d.getFullYear()).slice(-2);
-
-  return `SLS-${dd}${mm}${yy}${String(urut).padStart(4, "0")}`;
-}
-
-/* =====================================================
- * AUTO GENERATE NO NOTA PENJUALAN (UI BASED)
- * - Read tbl_TransaksiPenjualan
- * - Filter by tanggal
- * - Hitung urutan
- * ===================================================== */
-export async function generateNotaPenjualan(tanggal) {
-  if (!tanggal) {
-    throw new Error("Tanggal wajib diisi untuk generate nota");
-  }
-
-  const res = await postAPI({
-    action: "apiGetTransaksiPenjualan",
-  });
-
-  const rows = Array.isArray(res?.data)
-    ? res.data
-    : Array.isArray(res?.data?.data)
-    ? res.data.data
-    : [];
-
-  // samakan format tanggal (yyyy-mm-dd)
-  const todayRows = rows.filter(r => {
-    if (!r.tanggal) return false;
-    return r.tanggal === tanggal;
-  });
-
-  const nextUrut = todayRows.length + 1;
-
-  return formatNota(tanggal, nextUrut);
-}
-
-/* =====================================================
- * GET BARANG TERSEDIA
- * Endpoint: path = barang
- * Filter: status === "TERSEDIA"
- * jsonResponse: { status, data }
+ * GET BARANG TERSEDIA (SHARED)
  * ===================================================== */
 export async function getBarangTersedia() {
   const res = await postAPI("barang");
 
-  if (res?.status !== "OK") {
-    return [];
-  }
+  if (res?.status !== "OK") return [];
 
   const rows = Array.isArray(res.data) ? res.data : [];
 
@@ -80,25 +24,48 @@ export async function getBarangTersedia() {
 }
 
 /* =====================================================
- * INIT MODAL PENJUALAN
- * - generate nota
- * - load barang tersedia
+ * REQUEST NO NOTA (CREATE ONLY)
+ * ===================================================== */
+export async function requestNoNotaPenjualan(tanggal) {
+  if (!tanggal) {
+    throw new Error("Tanggal wajib diisi");
+  }
+
+  const res = await postAPI("apiGenerateNotaPenjualan", { tanggal });
+
+  if (res?.status !== "OK") {
+    throw new Error(res?.data?.message || "Gagal generate no nota");
+  }
+
+  return res.data.noNota;
+}
+
+/* =====================================================
+ * INIT MODAL PENJUALAN (CREATE ONLY)
+ * ⚠️ JANGAN DIPAKAI SAAT EDIT
  * ===================================================== */
 export async function initPenjualanModal(tanggal) {
-  const [noNota, barangList] = await Promise.all([
-    generateNotaPenjualan(tanggal),
+  if (!tanggal) {
+    throw new Error("Tanggal wajib diisi");
+  }
+
+  const [barangList, noNota] = await Promise.all([
     getBarangTersedia(),
+    requestNoNotaPenjualan(tanggal),
   ]);
+
+  if (!noNota) {
+    throw new Error("No nota tidak berhasil dibuat");
+  }
 
   return {
     noNota,
     barangList,
   };
 }
+
 /* =====================================================
- * HANDLE SUBMIT TRANSAKSI PENJUALAN
- * - Pure function
- * - Tidak tahu React / event
+ * SUBMIT TRANSAKSI (CREATE / EDIT)
  * ===================================================== */
 export async function submitPenjualan(body) {
   const res = await postAPI("apiSaveTransaksiPenjualan", body);
@@ -110,8 +77,14 @@ export async function submitPenjualan(body) {
   return res.data;
 }
 
-// lib/penjualan/penjualanModalHelper.js
+/* =====================================================
+ * LOAD DETAIL PENJUALAN (EDIT ONLY)
+ * ===================================================== */
 export async function loadDetailBarang(noNota) {
+  if (!noNota) {
+    throw new Error("No nota wajib diisi");
+  }
+
   const res = await postAPI("apiGetPenjualanByNota", { noNota });
 
   if (res?.status !== "OK") {

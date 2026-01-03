@@ -11,6 +11,7 @@ import {
 } from "@/lib/dashboardHelper";
 import PettyCashModal from "@/components/pettyCashModal";
 import SalesModal from "@/components/penjualan/SalesModal";
+import { postAPI } from "@/lib/api";
 
 export default function DashboardPage() {
   const [openService, setOpenService] = useState(false);
@@ -18,32 +19,33 @@ export default function DashboardPage() {
   const [serviceByTeknisi, setServiceByTeknisi] = useState([]);
   const [openSalesModal, setOpenSalesModal] = useState(false);
 
-  // ===============================
-  // STATE UNTUK MODE CREATE / EDIT SERVICE
-  // ===============================
   const [selectedService, setSelectedService] = useState(null);
 
-  // ===============================
-  // PETTY CASH STATE (HARIAN)
-  // ===============================
+  /* ===============================
+     PETTY CASH STATE
+  =============================== */
   const [openPettyCash, setOpenPettyCash] = useState(false);
   const [pettyCashValue, setPettyCashValue] = useState("");
-  const [pettyCashTanggal, setPettyCashTanggal] = useState(
-    new Date().toDateString()
-  );
 
-  // KPI STATE
+  /* ===============================
+     KPI STATE (REAL DATA)
+  =============================== */
   const [kpiServiceDiterima, setKpiServiceDiterima] = useState(0);
-  const [kpiKasToko, setKpiKasToko] = useState(3500000);
-  const [kpiTransfer, setKpiTransfer] = useState(1250000);
-  const [kpiOmzet, setKpiOmzet] = useState(4750000);
+  const [kpiKasToko, setKpiKasToko] = useState(0);
+  const [kpiTransfer, setKpiTransfer] = useState(0);
+  const [kpiOmzet, setKpiOmzet] = useState(0);
 
-  // BARANG STATE (MASTER DATA)
+  /* ===============================
+     BARANG STATE
+  =============================== */
   const [barangList, setBarangList] = useState([]);
   const [searchBarang, setSearchBarang] = useState("");
   const [selectedBarang, setSelectedBarang] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  /* ===============================
+     LOAD DASHBOARD DATA
+  =============================== */
   useEffect(() => {
     fetchDashboardService({
       setServiceList,
@@ -54,46 +56,72 @@ export default function DashboardPage() {
     fetchDashboardBarang({
       setBarangList,
     });
+
+    loadKasHarian();
   }, []);
 
-  // ===============================
-  // RESET PETTY CASH SAAT GANTI TANGGAL
-  // ===============================
-  useEffect(() => {
-    const today = new Date().toDateString();
+  /* ===============================
+     LOAD KAS HARIAN (REAL)
+  =============================== */
+async function loadKasHarian() {
+  try {
+    console.log("Memanggil endpoint get-kas-harian...");
 
-    if (pettyCashTanggal !== today) {
-      setPettyCashTanggal(today);
-      setPettyCashValue("");
+    // Panggil endpoint tanpa tanggal → API akan pakai default today
+    const res = await postAPI("get-kas-harian", {});
+
+    console.log("Response dari endpoint:", res);
+
+    if (res.status !== "OK") {
+      console.warn("Endpoint tidak mengembalikan status OK");
+      return;
     }
-  }, [pettyCashTanggal]);
 
-  // ===============================
-  // FILTER BARANG (UNTUK DROPDOWN)
-  // ===============================
-  const filteredBarang = filterBarang(barangList, searchBarang);
+    const { kasAkhir, totalPemasukan, tanggal } = res.data;
 
-  // ===============================
-  // SUBMIT PETTY CASH (LOCAL ONLY)
-  // ===============================
-  function submitPettyCash() {
-    const nominal = Number(pettyCashValue || 0);
-    if (!nominal || nominal <= 0) return;
+    console.log("Data kas harian:", { tanggal, kasAkhir, totalPemasukan });
 
-    setKpiKasToko(prev => prev + nominal);
-    setKpiOmzet(prev => prev + nominal);
-
-    setPettyCashValue("");
-    setOpenPettyCash(false);
+    setKpiKasToko(Number(kasAkhir || 0));
+    setKpiOmzet(Number(totalPemasukan || 0));
+  } catch (err) {
+    console.error("Terjadi error saat loadKasHarian:", err);
   }
+}
+
+
+/* ===============================
+   SUBMIT PETTY CASH → API
+=============================== */
+async function submitPettyCash(tanggal) {
+  const nominal = Number(pettyCashValue || 0);
+  if (nominal <= 0) return;
+
+  const res = await postAPI("petty-cash", {
+    tanggal,       // dari modal
+    pettyCash: nominal,
+  });
+
+  if (res.status !== "OK") {
+    alert(res.data.message);
+    return;
+  }
+
+  setPettyCashValue("");
+  setOpenPettyCash(false);
+
+  loadKasHarian();
+}
+
+  /* ===============================
+     FILTER BARANG
+  =============================== */
+  const filteredBarang = filterBarang(barangList, searchBarang);
 
   return (
     <>
       <ContainerCard>
 
-        {/* ================================================= */}
-        {/* DASHBOARD HEADER + QUICK ACTION */}
-        {/* ================================================= */}
+        {/* ================= HEADER ================= */}
         <div className="dashboard-header">
           <div>
             <h2>Dashboard</h2>
@@ -111,12 +139,12 @@ export default function DashboardPage() {
               + Service Baru
             </button>
 
-			<button
-			  className="action"
-			  onClick={() => setOpenSalesModal(true)}
-			>
-			  + Penjualan
-			</button>
+            <button
+              className="action"
+              onClick={() => setOpenSalesModal(true)}
+            >
+              + Penjualan
+            </button>
 
             <button
               className="action success"
@@ -127,42 +155,32 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* ================================================= */}
-        {/* KPI CARDS */}
-        {/* ================================================= */}
+        {/* ================= KPI ================= */}
         <div className="dashboard-kpi">
           <div className="kpi-card service">
-            <div className="kpi-content">
-              <span className="kpi-label">Service Diterima</span>
-              <strong className="kpi-value">{kpiServiceDiterima}</strong>
-            </div>
+            <span className="kpi-label">Service Diterima</span>
+            <strong className="kpi-value">{kpiServiceDiterima}</strong>
           </div>
 
           <div className="kpi-card success">
-            <div className="kpi-content">
-              <span className="kpi-label">Saldo Kas Toko</span>
-              <strong className="kpi-value">
-                Rp {kpiKasToko.toLocaleString("id-ID")}
-              </strong>
-            </div>
+            <span className="kpi-label">Saldo Kas Toko</span>
+            <strong className="kpi-value">
+              Rp {kpiKasToko.toLocaleString("id-ID")}
+            </strong>
           </div>
 
           <div className="kpi-card warning">
-            <div className="kpi-content">
-              <span className="kpi-label">Pembayaran Transfer</span>
-              <strong className="kpi-value">
-                Rp {kpiTransfer.toLocaleString("id-ID")}
-              </strong>
-            </div>
+            <span className="kpi-label">Pembayaran Transfer</span>
+            <strong className="kpi-value">
+              Rp {kpiTransfer.toLocaleString("id-ID")}
+            </strong>
           </div>
 
           <div className="kpi-card revenue">
-            <div className="kpi-content">
-              <span className="kpi-label">Total Omzet Hari Ini</span>
-              <strong className="kpi-value">
-                Rp {kpiOmzet.toLocaleString("id-ID")}
-              </strong>
-            </div>
+            <span className="kpi-label">Omzet Hari Ini</span>
+            <strong className="kpi-value">
+              Rp {kpiOmzet.toLocaleString("id-ID")}
+            </strong>
           </div>
         </div>
 
@@ -329,13 +347,13 @@ export default function DashboardPage() {
       {/* ================================================= */}
       {/* MODAL PETTY CASH (SIMPLE) */}
       {/* ================================================= */}
-		<PettyCashModal
-		  open={openPettyCash}
-		  value={pettyCashValue}
-		  onChange={setPettyCashValue}
-		  onClose={() => setOpenPettyCash(false)}
-		  onSubmit={submitPettyCash}
-		/>
+      <PettyCashModal
+        open={openPettyCash}
+        value={pettyCashValue}
+        onChange={setPettyCashValue}
+        onClose={() => setOpenPettyCash(false)}
+        onSubmit={submitPettyCash}
+      />
 
       <ServiceModal
         open={openService}
@@ -346,11 +364,11 @@ export default function DashboardPage() {
         serviceData={selectedService}
         mode={selectedService ? "edit" : "create"}
       />
-	  
-		<SalesModal
-		  open={openSalesModal}
-		  onClose={() => setOpenSalesModal(false)}
-		/>
+
+      <SalesModal
+        open={openSalesModal}
+        onClose={() => setOpenSalesModal(false)}
+      />
     </>
   );
 }

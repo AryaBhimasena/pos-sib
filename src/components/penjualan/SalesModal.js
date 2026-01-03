@@ -10,9 +10,13 @@ import {
   initPenjualanModal,
   submitPenjualan,
   loadDetailBarang,
+  getBarangTersedia, // ⬅️ TAMBAH
 } from "@/lib/penjualan/penjualanModalHelper";
 
 export default function SalesModal({ open, onClose, data }) {
+
+  const isEdit = Boolean(data?.noNota);
+
   const [form, setForm] = useState({
     noNota: "",
     tanggal: "",
@@ -26,21 +30,25 @@ export default function SalesModal({ open, onClose, data }) {
   const [items, setItems] = useState([]);
   const [searchBarang, setSearchBarang] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
-  
 
-  /* ================= INIT MODAL ================= */
+/* ================= INIT MODAL ================= */
 useEffect(() => {
   if (!open) return;
 
-  if (data) {
-    // MODE EDIT
-    loadDetailBarang(data.id).then(res => {
+  /* ================= RESET GLOBAL ================= */
+  setItems([]);
+  setSearchBarang("");
+  setSelectedBarang(null);
+
+  if (isEdit) {
+    /* ===== MODE EDIT ===== */
+    loadDetailBarang(data.noNota).then(res => {
       const { header, items } = res;
 
       setForm({
         noNota: header.ID_Penjualan,
         tanggal: header.Tanggal,
-        namaPelanggan: header.NamaPelanggan,
+        namaPelanggan: header.NamaPelanggan || "",
         metodeBayar: header.MetodeBayar,
         statusBayar: header.StatusBayar,
       });
@@ -54,28 +62,37 @@ useEffect(() => {
       );
     });
 
-    // tetap load master barang agar bisa tambah item
-    initPenjualanModal(data.tanggal).then(res => {
-      setBarangList(res.barangList);
-    });
+    getBarangTersedia().then(setBarangList);
+
   } else {
-    // MODE CREATE
+    /* ===== MODE CREATE ===== */
+
     const today = new Date().toISOString().split("T")[0];
 
-    setItems([]);
-    setSearchBarang("");
-    setSelectedBarang(null);
+    // 🔴 PENTING: kosongkan dulu no nota
+    setForm({
+      noNota: "",
+      tanggal: today,
+      namaPelanggan: "",
+      metodeBayar: "Tunai",
+      statusBayar: "Lunas",
+    });
 
-    initPenjualanModal(today).then(res => {
+    // ambil barang & generate nota (selalu fresh)
+    Promise.all([
+      getBarangTersedia(),
+      initPenjualanModal(today), // hanya dipakai untuk generate nota
+    ]).then(([barang, res]) => {
+      setBarangList(barang);
       setForm(f => ({
         ...f,
-        tanggal: today,
         noNota: res.noNota,
       }));
-      setBarangList(res.barangList);
     });
   }
-}, [open, data]);
+
+}, [open, isEdit, data?.noNota]);
+
 
   /* ================= COMPUTED ================= */
   const totalItem = items.length;
@@ -97,10 +114,19 @@ useEffect(() => {
   }, [searchBarang, barangList]);
 
   /* ================= HANDLER ================= */
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setForm(f => ({ ...f, [name]: value }));
-  };
+const handleChange = async e => {
+  const { name, value } = e.target;
+
+  setForm(f => ({ ...f, [name]: value }));
+
+  if (name === "tanggal" && !isEdit) {
+    // kosongkan dulu agar tidak pakai cache visual
+    setForm(f => ({ ...f, noNota: "" }));
+
+    const res = await initPenjualanModal(value);
+    setForm(f => ({ ...f, noNota: res.noNota }));
+  }
+};
 
   const addBarang = () => {
     if (!selectedBarang) return;
@@ -123,37 +149,40 @@ useEffect(() => {
     setItems(i => i.filter((_, i2) => i2 !== idx));
   };
 
-const handleSubmit = async e => {
-  e.preventDefault();
+  const handleSubmit = async e => {
+    e.preventDefault();
 
-  if (items.length === 0) {
-    alert("Barang belum ditambahkan");
-    return;
-  }
+    if (items.length === 0) {
+      alert("Barang belum ditambahkan");
+      return;
+    }
 
-  const body = {
-    noNota: form.noNota,
-    tanggal: form.tanggal,
-    namaPelanggan: form.namaPelanggan || "",
-    metodeBayar: form.metodeBayar || "Tunai",
-    statusBayar: form.statusBayar || "Lunas",
-    totalItem: items.length,
-    totalHarga: totalHarga,
-    items: items.map(it => ({
-      idBarang: it.idBarang,
-      namaBarang: it.namaBarang,
-      harga: Number(it.harga),
-    })),
+    const baseBody = {
+      tanggal: form.tanggal,
+      namaPelanggan: form.namaPelanggan || "",
+      metodeBayar: form.metodeBayar,
+      statusBayar: form.statusBayar,
+      totalItem: items.length,
+      totalHarga,
+      items: items.map(it => ({
+        idBarang: it.idBarang,
+        namaBarang: it.namaBarang,
+        harga: Number(it.harga),
+      })),
+    };
+
+    const body = isEdit
+      ? { ...baseBody, noNota: form.noNota, mode: "EDIT" }
+      : { ...baseBody, mode: "CREATE" };
+
+    try {
+      await submitPenjualan(body);
+      alert("Transaksi penjualan berhasil disimpan");
+      onClose();
+    } catch (err) {
+      alert(err.message || String(err));
+    }
   };
-
-  try {
-    await submitPenjualan(body);
-    alert("Transaksi penjualan berhasil disimpan");
-    onClose();
-  } catch (err) {
-    alert(err.message || String(err));
-  }
-};
 
   if (!open) return null;
 
@@ -162,7 +191,7 @@ const handleSubmit = async e => {
       <div className="sales-modal fixed">
         {/* HEADER */}
         <div className="modal-header">
-          <h3>Penjualan Baru</h3>
+          <h3>{isEdit ? "Edit Penjualan" : "Penjualan Baru"}</h3>
           <button className="close" onClick={onClose}>×</button>
         </div>
 
@@ -304,19 +333,18 @@ const handleSubmit = async e => {
                 <strong> Rp {totalHarga.toLocaleString("id-ID")}</strong>
               </div>
             </div>
-        {/* FOOTER */}
-        <div className="modal-footer">
-          <button type="button" className="btn ghost" onClick={onClose}>
-            Batal
-          </button>
-			<button type="submit" className="btn primary">
-			  Simpan Transaksi
-			</button>
-        </div>
+
+            {/* FOOTER */}
+            <div className="modal-footer">
+              <button type="button" className="btn ghost" onClick={onClose}>
+                Batal
+              </button>
+              <button type="submit" className="btn primary">
+                Simpan Transaksi
+              </button>
+            </div>
           </div>
         </form>
-
-
       </div>
     </div>
   );
