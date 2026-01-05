@@ -5,6 +5,9 @@
 
 "use client";
 
+import { useRef } from "react";
+import html2pdf from "html2pdf.js";
+
 import { useServiceModal } from "@/lib/useServiceModal";
 
 import ServicePreview from "@/components/service/ServicePreview";
@@ -13,6 +16,9 @@ import ServiceCustomerSection from "@/components/service/ServiceCustomerSection"
 import ServiceTotalBiaya from "@/components/service/ServiceTotalBiaya";
 import ServicePaymentMethod from "@/components/service/ServicePaymentMethod";
 import ServiceNotaSection from "@/components/service/ServiceNotaSection";
+import { useServicePreview } from "@/components/service/useServicePreview";
+import ServiceNotaPDF from "@/components/service/ServiceNotaPDF";
+
 
 export default function ServiceModal({
   open,
@@ -51,11 +57,72 @@ export default function ServiceModal({
     setShowHp,
     setActiveNama,
     setActiveHp,
+	isHydrated,
+	jenisServiceList,
   } = useServiceModal(open, onClose, serviceData, mode);
+
+const normalizePhoneNumber = (value = "") => {
+  if (!value) return "";
+
+  let phone = String(value)
+    .replace(/\s+/g, "")
+    .replace(/-/g, "")
+    .replace(/\+/g, "");
+
+  if (phone.startsWith("62")) {
+    return phone;
+  }
+
+  if (phone.startsWith("0")) {
+    return "62" + phone.slice(1);
+  }
+
+  return "62" + phone;
+};
+  
+	const { preview } = useServicePreview(form, usedParts);
+	const pdfRef = useRef(null);
+	
+const handleSendWhatsApp = async () => {
+  if (!preview || !pdfRef.current || !activeHp) return;
+
+  const normalizedHp = normalizePhoneNumber(activeHp);
+  if (!normalizedHp) return;
+
+  const waLink = `https://wa.me/${normalizedHp}`;
+
+  // ⬇️ DYNAMIC IMPORT (AMAN UNTUK NEXT.JS)
+  const html2pdf = (await import("html2pdf.js")).default;
+
+  const options = {
+    margin: 0,
+    filename: `Nota-Service-${preview.nota}.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a5",
+      orientation: "landscape",
+    },
+  };
+
+  await html2pdf()
+    .set(options)
+    .from(pdfRef.current)
+    .toPdf()
+    .save(); // generate file di client
+
+  // Redirect ke WhatsApp
+  window.location.href = waLink;
+};
 
   if (!open) return null;
 
   return (
+  <>
     <div className="modal-backdrop">
       <div className="modal-container large">
 
@@ -72,11 +139,12 @@ export default function ServiceModal({
           <div className="service-form">
 
             {/* DATA NOTA */}
-            <ServiceNotaSection
-              form={form}
-              handleChange={handleChange}
-              handleBiayaChange={handleBiayaChange}
-            />
+			<ServiceNotaSection
+			  form={form}
+			  jenisServiceList={jenisServiceList}
+			  setForm={setForm}
+			  handleBiayaChange={handleBiayaChange}
+			/>
 
             {/* PELANGGAN */}
             <ServiceCustomerSection
@@ -114,6 +182,8 @@ export default function ServiceModal({
               form={form}
               setForm={setForm}
               usedParts={usedParts}
+			  mode={mode}
+			  isHydrated={isHydrated}
             />
 
             {/* METODE PEMBAYARAN */}
@@ -179,7 +249,14 @@ export default function ServiceModal({
 
             {/* FOOTER KANAN */}
             <div className="footer-right">
-              <button className="btn wa">Kirim WA</button>
+<button
+  className="btn wa"
+  onClick={handleSendWhatsApp}
+  disabled={!preview || !activeHp}
+>
+  Kirim WA
+</button>
+
               <button className="btn print">Print</button>
               <button className="btn secondary" onClick={onClose}>
                 Batal
@@ -194,5 +271,11 @@ export default function ServiceModal({
 
       </div>
     </div>
+	
+{/* PDF RENDER (HIDDEN) */}
+<div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+  <ServiceNotaPDF ref={pdfRef} preview={preview} />
+</div>
+</>
   );
 }

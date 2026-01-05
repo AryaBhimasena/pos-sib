@@ -5,41 +5,41 @@
 
 import { useState } from "react";
 
+export const initialServiceForm = {
+  nota: "",
+  jenisService: "",
+  idJenisService:"",
+  tanggalTerima: "",
+  estimasiSelesai: "",
+  estimasiBiaya: "",
+
+  pelanggan: "",
+  hp: "",
+
+  merek: "",
+  idMerekHP: "",
+  tipe: "",
+  keluhan: "",
+
+  jasaToko: "",
+  persenBagiHasil: 0,
+  komisiTeknisi: 0,
+
+  totalBarang: 0,
+  grandTotal: 0,
+
+  metodePembayaran: "",
+  statusBayar: "BELUM",
+  tanggalBayar: "",
+
+  teknisi: "",
+  idKaryawan: "",
+  statusService: "",
+};
+
 export function useServiceState() {
-  const [form, setForm] = useState({
-    nota: "",                    // 1. No Nota (ID_Service)
-    jenisService: "",             // 2. Jenis Service (Nama / Label UI)
-    tanggalTerima: "",            // 3. Tanggal Terima
-    estimasiSelesai: "",          // 4. Estimasi Selesai
-    estimasiBiaya: "",            // 5. Estimasi Biaya Awal (sebelum real cost)
-
-    pelanggan: "",               // 6. Nama Pelanggan
-    hp: "",                      // 7. No HP
-
-    merek: "",                   // 8. Merek HP (LABEL UI)
-    idMerekHP: "",               //    ID_MerekHP (PAYLOAD tbl_TransaksiService)
-
-    tipe: "",                    // 9. Tipe HP
-    keluhan: "",                 // 10. Keluhan / Kerusakan
-
-    jasaToko: "",                // 13. Jasa Toko
-    persenBagiHasil: 0,          // 14. Persen Komisi Teknisi
-
-    totalBarang: 0,              //    Total part digunakan (COUNT)
-    grandTotal: 0,               //    Total Biaya REAL (ServiceTotalBiaya)
-
-    totalBiaya: "",              // 15. (legacy UI, tidak dipakai payload)
-
-    metodePembayaran: "",        // 16. Metode Pembayaran
-    statusBayar: "BELUM",        //    Status Bayar (BELUM / LUNAS)
-    tanggalBayar: "",            //    Tanggal Bayar (saat DIAMBIL)
-
-    teknisi: "",                 // 17. Nama Teknisi (LABEL UI)
-    idKaryawan: "",              //    ID_Karyawan (PAYLOAD)
-
-    statusService: "",           // 18. Status Service (DITERIMA / DIAMBIL / DIBATALKAN)
-  });
-
+  const [form, setForm] = useState(initialServiceForm);
+	
   const [merekList, setMerekList] = useState([]);
   const [teknisiList, setTeknisiList] = useState([]);
   const [jenisServiceList, setJenisServiceList] = useState([]);
@@ -62,6 +62,7 @@ export function useServiceState() {
   // 11. Part Digunakan
   // 12. Biaya Part (diturunkan dari usedParts)
   const [usedParts, setUsedParts] = useState([]);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   return {
     form, setForm,
@@ -86,5 +87,6 @@ export function useServiceState() {
     showBarang, setShowBarang,
 
     usedParts, setUsedParts,
+	isHydrated, setIsHydrated,
   };
 }

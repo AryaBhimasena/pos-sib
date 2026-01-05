@@ -1,6 +1,14 @@
 "use client";
 
-export default function ServiceTotalBiaya({ form, setForm, usedParts }) {
+import { useEffect } from "react";
+
+export default function ServiceTotalBiaya({
+  form,
+  setForm,
+  usedParts,
+  mode,
+  isHydrated,
+}) {
   /* ================= HELPERS ================= */
   const formatNumber = (value) =>
     new Intl.NumberFormat("id-ID").format(Number(value) || 0);
@@ -17,18 +25,47 @@ export default function ServiceTotalBiaya({ form, setForm, usedParts }) {
     : 0;
 
   /* ================= JASA TOKO ================= */
-  const jasaToko = Number(form.jasaToko || 0);
+  const jasaToko = Number(form.jasaToko) || 0;
 
-  /* ================= PERSEN BAGI HASIL ================= */
-  const persenBagiHasil = Number(form.persenBagiHasil || 0);
+  /* ================= KOMISI ================= */
+  const persenBagiHasil = Number(form.persenBagiHasil) || 0;
+  const calculatedKomisi = Math.floor(jasaToko * persenBagiHasil);
 
-  /* ================= KOMISI TEKNISI ================= */
   const komisiTeknisi =
-    (biayaPart + jasaToko) * persenBagiHasil;
+    mode === "edit" && isHydrated && !form.__recalcKomisi
+      ? Number(form.komisiTeknisi) || 0
+      : calculatedKomisi;
 
-  /* ================= TOTAL BIAYA ================= */
-  const totalBiayaService =
-    biayaPart + jasaToko + komisiTeknisi;
+  /* ================= GRAND TOTAL ================= */
+  const grandTotal = biayaPart + jasaToko + komisiTeknisi;
+
+  /* ================= SYNC KE FORM ================= */
+useEffect(() => {
+  if (mode === "edit" && !isHydrated) return;
+
+  setForm((prev) => {
+    const shouldRecalc =
+      mode !== "edit" || prev.__recalcKomisi === true;
+
+    return {
+      ...prev,
+      ...(shouldRecalc
+        ? { komisiTeknisi }
+        : {}), // 🔒 JANGAN TIMPA KOMISI BACKEND
+      totalBarang: biayaPart,
+      grandTotal,
+    };
+  });
+  
+  console.log("[TOTAL BIAYA]", {
+  mode,
+  isHydrated,
+  jasaToko,
+  persenBagiHasil,
+  komisiTeknisi,
+});
+
+}, [biayaPart, jasaToko, komisiTeknisi, mode, isHydrated]);
 
   return (
     <div className="form-section total-biaya">
@@ -43,14 +80,15 @@ export default function ServiceTotalBiaya({ form, setForm, usedParts }) {
         <div className="form-group">
           <label>Jasa Toko</label>
           <input
-            value={jasaToko ? formatNumber(jasaToko) : ""}
+            value={formatNumber(jasaToko)}
             placeholder="0"
-            onChange={(e) =>
-              setForm((p) => ({
-                ...p,
-                jasaToko: parseNumber(e.target.value),
-              }))
-            }
+			onChange={(e) =>
+			  setForm((p) => ({
+				...p,
+				jasaToko: parseNumber(e.target.value),
+				__recalcKomisi: true, // 🔑 IZINKAN RECALC
+			  }))
+			}
           />
         </div>
 
@@ -61,7 +99,7 @@ export default function ServiceTotalBiaya({ form, setForm, usedParts }) {
 
         <div className="form-group full">
           <label>Total Biaya Service</label>
-          <input value={formatNumber(totalBiayaService)} disabled />
+          <input value={formatNumber(grandTotal)} disabled />
         </div>
       </div>
     </div>

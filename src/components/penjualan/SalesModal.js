@@ -13,7 +13,7 @@ import {
   getBarangTersedia, // ⬅️ TAMBAH
 } from "@/lib/penjualan/penjualanModalHelper";
 
-export default function SalesModal({ open, onClose, data }) {
+export default function SalesModal({ open, onClose, onSuccess, data }) {
 
   const isEdit = Boolean(data?.noNota);
 
@@ -178,6 +178,7 @@ const handleChange = async e => {
     try {
       await submitPenjualan(body);
       alert("Transaksi penjualan berhasil disimpan");
+	  onSuccess();
       onClose();
     } catch (err) {
       alert(err.message || String(err));

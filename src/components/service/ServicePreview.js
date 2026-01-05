@@ -1,3 +1,7 @@
+/* ======================================================
+   SERVICE PREVIEW COMPONENT UI
+   Lokasi: src/components/service/ServicePreview.js
+====================================================== */
 "use client";
 
 import { useServicePreview } from "./useServicePreview";

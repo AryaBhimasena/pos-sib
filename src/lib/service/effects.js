@@ -9,9 +9,36 @@ import {
   initServiceModal,
   hydrateServiceForm,
 } from "@/lib/serviceModalHelper";
+import { initialServiceForm } from "@/lib/service/state";
+
 
 export function useServiceEffects(open, state, serviceData, mode = "create") {
   const abortRef = useRef(null);
+useEffect(() => {
+  if (!open) return;
+  if (mode === "edit") return;
+
+  // ✅ RESET TOTAL STATE SAAT MODAL DIBUKA
+  state.setForm((p) => ({
+  ...initialServiceForm,
+  statusBayar: p.statusBayar ?? "BELUM",
+  metodePembayaran: p.metodePembayaran ?? "TUNAI",
+}));
+
+  state.setUsedParts([]);
+
+  state.setShowNama(false);
+  state.setShowHp(false);
+  state.setActiveNama(-1);
+  state.setActiveHp(-1);
+
+  state.setIsNewCustomer(false);
+
+  state.setBarangSearch("");
+  state.setFilteredBarang([]);
+  state.setSelectedBarang(null);
+  state.setShowBarang(false);
+}, [open, mode]);
 
   /* ======================================================
      INIT MODAL (CREATE ONLY)
@@ -35,6 +62,7 @@ export function useServiceEffects(open, state, serviceData, mode = "create") {
           teknisi: init.defaultTeknisi,
           idKaryawan: init.defaultTeknisiId,
           jenisService: init.defaultJenisService,
+		  idJenisService: init.defaultJenisServiceId,
           persenBagiHasil: init.defaultPersenBagiHasil,
 
           statusService: p.statusService || "DITERIMA",
@@ -83,12 +111,14 @@ export function useServiceEffects(open, state, serviceData, mode = "create") {
           state.setUsedParts
         );
 
+		state.setIsHydrated(true);
+		
         /* LOAD MASTER DATA (EDIT MODE) */
         const init = await initServiceModal(controller.signal);
         state.setMerekList(init.merekList);
         state.setTeknisiList(init.teknisiList);
         state.setJenisServiceList(init.jenisServiceList);
-
+		
       } catch (err) {
         if (err.name !== "AbortError") {
           console.error("Hydrate service gagal", err);

@@ -20,6 +20,11 @@ export default function DashboardPage() {
   const [openSalesModal, setOpenSalesModal] = useState(false);
 
   const [selectedService, setSelectedService] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+	const triggerRefresh = () => {
+	  setRefreshKey(prev => prev + 1);
+	};
 
   /* ===============================
      PETTY CASH STATE
@@ -58,36 +63,32 @@ export default function DashboardPage() {
     });
 
     loadKasHarian();
-  }, []);
+  }, [refreshKey]);
 
   /* ===============================
      LOAD KAS HARIAN (REAL)
   =============================== */
 async function loadKasHarian() {
   try {
-    console.log("Memanggil endpoint get-kas-harian...");
-
-    // Panggil endpoint tanpa tanggal → API akan pakai default today
     const res = await postAPI("get-kas-harian", {});
 
-    console.log("Response dari endpoint:", res);
+    if (res.status !== "OK") return;
 
-    if (res.status !== "OK") {
-      console.warn("Endpoint tidak mengembalikan status OK");
-      return;
-    }
+    const {
+      transaksiTunai,
+      transaksiTransfer,
+      saldoKasToko,
+      omzetHariIni,
+    } = res.data;
 
-    const { kasAkhir, totalPemasukan, tanggal } = res.data;
+    setKpiKasToko(Number(saldoKasToko || 0));
+    setKpiTransfer(Number(transaksiTransfer || 0));
+    setKpiOmzet(Number(omzetHariIni || 0));
 
-    console.log("Data kas harian:", { tanggal, kasAkhir, totalPemasukan });
-
-    setKpiKasToko(Number(kasAkhir || 0));
-    setKpiOmzet(Number(totalPemasukan || 0));
   } catch (err) {
-    console.error("Terjadi error saat loadKasHarian:", err);
+    console.error("Gagal load kas harian:", err);
   }
 }
-
 
 /* ===============================
    SUBMIT PETTY CASH → API
@@ -109,7 +110,7 @@ async function submitPettyCash(tanggal) {
   setPettyCashValue("");
   setOpenPettyCash(false);
 
-  loadKasHarian();
+  triggerRefresh();
 }
 
   /* ===============================
@@ -344,9 +345,6 @@ async function submitPettyCash(tanggal) {
 		
       </ContainerCard>
 
-      {/* ================================================= */}
-      {/* MODAL PETTY CASH (SIMPLE) */}
-      {/* ================================================= */}
       <PettyCashModal
         open={openPettyCash}
         value={pettyCashValue}
@@ -363,11 +361,13 @@ async function submitPettyCash(tanggal) {
         }}
         serviceData={selectedService}
         mode={selectedService ? "edit" : "create"}
+		onSuccess={triggerRefresh}
       />
 
       <SalesModal
         open={openSalesModal}
         onClose={() => setOpenSalesModal(false)}
+		onSuccess={triggerRefresh}
       />
     </>
   );

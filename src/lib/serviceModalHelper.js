@@ -60,7 +60,8 @@ export const initServiceModal = async (signal) => {
     defaultTeknisi: defaultTeknisi?.nama || "",
     defaultTeknisiId: defaultTeknisi?.id || "",
 
-    defaultJenisService: defaultJenisService?.nama || "",
+    defaultJenisServiceNama: defaultJenisService?.nama || "",
+	defaultJenisServiceId: defaultJenisService?.id || "",
     defaultPersenBagiHasil:
       Number(defaultJenisService?.persenBagiHasil) || 0,
   };
@@ -68,6 +69,8 @@ export const initServiceModal = async (signal) => {
 
 /* ======================================================
    HYDRATE FORM (EDIT MODE)
+   - Endpoint kirim ID + LABEL
+   - Frontend hanya hydrate state (tanpa resolve ulang)
 ====================================================== */
 export const hydrateServiceForm = (
   data,
@@ -84,53 +87,58 @@ export const hydrateServiceForm = (
   setForm((p) => ({
     ...p,
 
-    /* NOTA */
-    nota: form.nota,
-    jenisService: form.jenisService,
+    __recalcKomisi: false, // reset flag kalkulasi
 
-    /* TANGGAL */
+    /* ================= NOTA ================= */
+    nota: form.nota || "",
+
+    /* ================= JENIS SERVICE ================= */
+    jenisService: form.jenisService || "",
+    idJenisService: form.idJenisService || "",
+
+    /* ================= TANGGAL ================= */
     tanggalTerima: normalizeDate(form.tanggalTerima),
     estimasiSelesai: normalizeDate(form.estimasiSelesai),
     estimasiBiaya: String(form.estimasiBiaya || ""),
 
-    /* PELANGGAN */
-    pelanggan: form.pelanggan,
-    hp: form.hp,
+    /* ================= PELANGGAN ================= */
+    pelanggan: form.pelanggan || "",
+    hp: form.hp || "",
 
-    /* PERANGKAT */
+    /* ================= PERANGKAT ================= */
     merek: form.merek || "",
-    idMerekHP: form.idMerekHP,
-    tipe: form.tipe,
-    keluhan: form.keluhan,
+    idMerekHP: form.idMerekHP || "",
+    tipe: form.tipe || "",
+    keluhan: form.keluhan || "",
 
-    /* BIAYA */
-    jasaToko: String(form.jasaToko || ""),
+    /* ================= BIAYA ================= */
+    jasaToko: String(form.jasaToko || 0),
+    komisiTeknisi: Number(form.komisiTeknisiDB || 0),
     persenBagiHasil: Number(form.persenBagiHasil || 0),
 
     totalBarang: Number(form.totalBarang || 0),
     grandTotal: Number(form.grandTotal || 0),
 
-    totalBiaya: "",
-
-    /* PEMBAYARAN */
-    metodePembayaran: form.metodePembayaran,
-    statusBayar: form.statusBayar,
+    /* ================= PEMBAYARAN ================= */
+    metodePembayaran: form.metodePembayaran || "",
+    statusBayar: form.statusBayar || "BELUM",
     tanggalBayar: normalizeDate(form.tanggalBayar),
 
-    /* TEKNISI */
-    teknisi: form.teknisi,
-    idKaryawan: form.idKaryawan,
+    /* ================= TEKNISI ================= */
+    teknisi: form.teknisi || "",
+    idKaryawan: form.idKaryawan || "",
 
-    /* STATUS */
-    statusService: form.statusService,
+    /* ================= STATUS ================= */
+    statusService: form.statusService || "DITERIMA",
   }));
 
+  /* ================= USED PARTS ================= */
   setUsedParts(
     Array.isArray(usedParts)
       ? usedParts.map((p) => ({
           uuid: p.uuid,
-          id: p.id || p.idBarang,
-          nama: p.nama,
+          id: p.id || p.idBarang || "",
+          nama: p.nama || "",
           hargaJual: Number(p.hargaJual || 0),
           status: p.status || "used",
         }))
@@ -149,9 +157,21 @@ export const fetchPelanggan = async (query, by) => {
 /* ======================================================
    SUBMIT SERVICE
 ====================================================== */
-export const submitService = async (form, usedParts = []) => {
-  return postAPI("create-service", {
+export const submitService = async (
+  form,
+  usedParts = [],
+  mode = "create"
+) => {
+  const path =
+    mode === "edit"
+      ? "update-service"
+      : "create-service";
+
+  return postAPI(path, {
+    path, // 🔴 WAJIB untuk GAS
+
     nota: form.nota,
+
     tanggalTerima: form.tanggalTerima,
     estimasiSelesai: form.estimasiSelesai,
 
@@ -162,7 +182,7 @@ export const submitService = async (form, usedParts = []) => {
     tipe: form.tipe,
     keluhan: form.keluhan,
 
-    jenisService: form.jenisService,
+    idJenisService: form.idJenisService,
     statusService: form.statusService || "DITERIMA",
 
     estimasiBiaya: Number(
@@ -172,6 +192,7 @@ export const submitService = async (form, usedParts = []) => {
       String(form.jasaToko || "0").replace(/\D/g, "")
     ),
     persenBagiHasil: Number(form.persenBagiHasil || 0),
+	komisiTeknisi: form.komisiTeknisi,
 
     totalBarang: Number(form.totalBarang || 0),
     grandTotal: Number(form.grandTotal || 0),

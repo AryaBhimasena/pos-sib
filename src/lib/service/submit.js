@@ -1,11 +1,10 @@
-/* ======================================================
-   SERVICE SUBMIT
-   Lokasi: lib/service/submit.js
-====================================================== */
-
 import { submitService, formatRupiah } from "@/lib/serviceModalHelper";
 
-export function useServiceSubmit(state, onClose) {
+export function useServiceSubmit(
+  state,
+  onClose,
+  mode = "create"
+) {
   const handleChange = (e) =>
     state.setForm({
       ...state.form,
@@ -41,28 +40,34 @@ export function useServiceSubmit(state, onClose) {
     });
 
   /* ================= SUBMIT ================= */
-const handleSubmit = async () => {
-  try {
-    syncTotalBarang();
+  const handleSubmit = async () => {
+    try {
+      syncTotalBarang();
 
-    const submitForm = {
-      ...state.form,
-      totalBarang: state.usedParts.length,
-    };
+      const submitForm = {
+        ...state.form,
+        statusBayar: state.form.statusBayar || "BELUM",
+        totalBarang: state.usedParts.length,
+      };
 
-    /* ================= DEBUG PAYLOAD ================= */
-    console.log("SUBMIT SERVICE PAYLOAD", {
-      form: submitForm,
-      usedParts: state.usedParts,
-    });
+      console.log("SUBMIT SERVICE PAYLOAD", {
+        mode,
+        form: submitForm,
+        usedParts: state.usedParts,
+      });
 
-    await submitService(submitForm, state.usedParts);
-    onClose();
-  } catch (err) {
-    console.error("Gagal simpan service", err);
-    alert("Gagal menyimpan data service");
-  }
-};
+      await submitService(
+        submitForm,
+        state.usedParts,
+        mode
+      );
+
+      onClose();
+    } catch (err) {
+      console.error("Gagal simpan service", err);
+      alert("Gagal menyimpan data service");
+    }
+  };
 
   return {
     handleChange,

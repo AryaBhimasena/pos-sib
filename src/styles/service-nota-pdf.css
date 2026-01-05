@@ -1,0 +1,140 @@
+/* ======================================================
+   SERVICE NOTA PDF STYLE (SAFE A5 LANDSCAPE)
+====================================================== */
+
+@page {
+  size: A5 landscape;
+  margin: 8mm;
+}
+
+/* PAGE WRAPPER */
+.nota-page {
+  width: 210mm;
+  height: 148mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+}
+
+/* MAIN CONTAINER */
+.nota-container {
+  width: 100%;
+  max-width: 194mm;
+  min-height: 120mm;
+
+  padding: 8mm 10mm;
+  box-sizing: border-box;
+
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  color: #000;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================= HEADER ================= */
+
+.nota-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.nota-header-left {
+  display: flex;
+  gap: 10px;
+}
+
+.nota-logo {
+  width: 40px;
+  height: 40px;
+  background: #e5e7eb;
+}
+
+.nota-title {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.nota-text {
+  font-size: 11px;
+}
+
+.nota-header-right {
+  text-align: right;
+}
+
+.nota-label {
+  font-size: 11px;
+}
+
+.nota-number {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* ================= TABLE ================= */
+
+.nota-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6mm;
+}
+
+.nota-table td {
+  padding: 3px 5px;
+  vertical-align: top;
+}
+
+.nota-table .label {
+  font-weight: bold;
+  width: 18%;
+}
+
+/* ================= KELUHAN ================= */
+
+.nota-keluhan {
+  margin-top: 6mm;
+}
+
+.keluhan-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.keluhan-box {
+  min-height: 18mm;
+  padding: 6px;
+  border: 1px dashed #cbd5e1;
+}
+
+/* ================= FOOTER ================= */
+
+.nota-footer {
+  margin-top: 6mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.biaya-label {
+  font-weight: bold;
+}
+
+.biaya-value {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.penerima {
+  text-align: center;
+}
+
+.signature-line {
+  width: 38mm;
+  height: 18mm;
+  border-bottom: 1px solid #000;
+  margin-top: 10mm;
+}

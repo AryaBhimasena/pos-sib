@@ -1,10 +1,6 @@
 /* ======================================================
    DASHBOARD HELPER
    Lokasi: lib/dashboardHelper.js
-   Catatan:
-   - TIDAK ada perubahan logic
-   - TIDAK ada refactor internal
-   - Hanya pemindahan fungsi
 ====================================================== */
 
 import { postAPI } from "@/lib/api";

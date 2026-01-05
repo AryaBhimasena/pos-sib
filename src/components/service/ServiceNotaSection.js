@@ -4,6 +4,8 @@ export default function ServiceNotaSection({
   form,
   handleChange,
   handleBiayaChange,
+  jenisServiceList,
+  setForm,
 }) {
   return (
     <>
@@ -18,12 +20,27 @@ export default function ServiceNotaSection({
         <div className="form-group">
           <label>Jenis Service</label>
           <select
-            name="jenisService"
-            value={form.jenisService || "MESIN"}
-            onChange={handleChange}
+            value={form.idJenisService}
+            onChange={(e) => {
+              const selectedId = e.target.value;
+              const selected = jenisServiceList.find(
+                (js) => js.id === selectedId
+              );
+
+              if (!selected) return;
+
+              setForm((prev) => ({
+                ...prev,
+                idJenisService: selected.id,
+                persenBagiHasil: Number(selected.persenBagiHasil) || 0,
+              }));
+            }}
           >
-            <option value="MESIN">Mesin</option>
-            <option value="INTERFACE">Interface</option>
+            {jenisServiceList.map((js) => (
+              <option key={js.id} value={js.id}>
+                {js.nama}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -56,6 +73,7 @@ export default function ServiceNotaSection({
         <div className="form-group biaya-label">
           <label>Estimasi Biaya Awal</label>
         </div>
+
         <div className="form-group biaya-input">
           <input
             name="estimasiBiaya"

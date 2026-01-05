@@ -32,10 +32,7 @@ export function useServicePreview(sourceForm, usedParts) {
     const jasaToko = Number(sourceForm.jasaToko || 0);
 
     /* ================= KOMISI TEKNISI ================= */
-    const persenBagiHasil = Number(sourceForm.persenBagiHasil || 0);
-
-    const komisiTeknisi =
-      (biayaPart + jasaToko) * persenBagiHasil;
+    const komisiTeknisi = Number(sourceForm.komisiTeknisi || 0);
 
     /* ================= TOTAL BIAYA SERVICE ================= */
     const totalBiayaService =
