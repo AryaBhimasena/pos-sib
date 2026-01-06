@@ -14,7 +14,7 @@ export default function ServiceNotaSection({
       <div className="form-grid-2">
         <div className="form-group">
           <label>No Nota</label>
-          <input value={form.nota} disabled />
+          <input value={form.nota} readOnly />
         </div>
 
         <div className="form-group">

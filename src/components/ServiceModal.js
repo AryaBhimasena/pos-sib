@@ -6,7 +6,6 @@
 "use client";
 
 import { useRef } from "react";
-import html2pdf from "html2pdf.js";
 
 import { useServiceModal } from "@/lib/useServiceModal";
 
