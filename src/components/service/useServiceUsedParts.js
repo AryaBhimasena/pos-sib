@@ -85,23 +85,28 @@ export function useServiceUsedParts(
   }, [open]);
 
   /* ================= FILTER BARANG ================= */
-  useEffect(() => {
-    if (!barangSearch) {
-      setFilteredBarang([]);
-      return;
-    }
+	useEffect(() => {
+	  if (!barangSearch) {
+		setFilteredBarang([]);
+		return;
+	  }
 
-    const keyword = barangSearch.toLowerCase();
+	  const keyword = barangSearch.toLowerCase();
 
-    const result = barangList.filter(
-      (item) =>
-        item.nama?.toLowerCase().includes(keyword) ||
-        item.sku?.toLowerCase().includes(keyword) ||
-        item.id?.toLowerCase().includes(keyword)
-    );
+	  const result = barangList
+		.filter((item) => {
+		  // ✅ FILTER STATUS
+		  if (item.status !== "TERSEDIA") return false;
 
-    setFilteredBarang(result.slice(0, 8));
-  }, [barangSearch, barangList]);
+		  return (
+			item.nama?.toLowerCase().includes(keyword) ||
+			item.sku?.toLowerCase().includes(keyword) ||
+			item.id?.toLowerCase().includes(keyword)
+		  );
+		});
+
+	  setFilteredBarang(result.slice(0, 8));
+	}, [barangSearch, barangList]);
 
   /* ================= SYNC KE PARENT ================= */
   useEffect(() => {

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 export default function ServiceCustomerSection({
   form,
   setForm,
@@ -24,6 +26,26 @@ export default function ServiceCustomerSection({
   setShowNama,
   setShowHp,
 }) {
+  const namaRef = useRef(null);
+  const hpRef = useRef(null);
+
+  /* ================= CLICK OUTSIDE ================= */
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (namaRef.current && !namaRef.current.contains(e.target)) {
+        setShowNama(false);
+      }
+
+      if (hpRef.current && !hpRef.current.contains(e.target)) {
+        setShowHp(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className="form-section">
       <div className="form-section-header">
@@ -39,9 +61,8 @@ export default function ServiceCustomerSection({
       </div>
 
       <div className="form-grid-2">
-
         {/* ================= NAMA ================= */}
-        <div className="form-group combobox">
+        <div className="form-group combobox" ref={namaRef}>
           <label>Nama Pelanggan</label>
           <input
             name="pelanggan"
@@ -66,7 +87,9 @@ export default function ServiceCustomerSection({
                     setShowNama(false);
                   }}
                 >
-                  {item.nama}
+                  <strong>{item.nama}</strong>
+                  <br />
+                  <small>{item.hp}</small>
                 </li>
               ))}
             </ul>
@@ -74,7 +97,7 @@ export default function ServiceCustomerSection({
         </div>
 
         {/* ================= HP ================= */}
-        <div className="form-group combobox">
+        <div className="form-group combobox" ref={hpRef}>
           <label>No HP</label>
           <input
             name="hp"
@@ -108,31 +131,30 @@ export default function ServiceCustomerSection({
         {/* ================= MEREK ================= */}
         <div className="form-group">
           <label>Merek HP</label>
-<select
-  value={form.idMerekHP}
-  onChange={(e) => {
-    const selected = merekList.find(
-      (m) => String(m.id) === e.target.value
-    );
+          <select
+            value={form.idMerekHP}
+            onChange={(e) => {
+              const selected = merekList.find(
+                (m) => String(m.id) === e.target.value
+              );
 
-    setForm((p) => ({
-      ...p,
-      idMerekHP: selected?.id || "",
-      merek: selected?.nama || "",
-    }));
-  }}
->
-  <option value="">Pilih Merek</option>
-  {merekList.map((m, i) => (
-    <option key={m.id || i} value={m.id}>
-      {m.nama}
-    </option>
-  ))}
-</select>
-
+              setForm((p) => ({
+                ...p,
+                idMerekHP: selected?.id || "",
+                merek: selected?.nama || "",
+              }));
+            }}
+          >
+            <option value="">Pilih Merek</option>
+            {merekList.map((m, i) => (
+              <option key={m.id || i} value={m.id}>
+                {m.nama}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* ================= TIPE (INPUT TEKS) ================= */}
+        {/* ================= TIPE ================= */}
         <div className="form-group">
           <label>Tipe HP</label>
           <input
@@ -142,7 +164,6 @@ export default function ServiceCustomerSection({
             placeholder="Contoh: Redmi Note 13 Pro, A15, iPhone 11"
           />
         </div>
-
       </div>
 
       {/* ================= KELUHAN ================= */}

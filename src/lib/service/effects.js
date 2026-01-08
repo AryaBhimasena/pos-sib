@@ -49,6 +49,11 @@ useEffect(() => {
 
     const controller = new AbortController();
     abortRef.current = controller;
+	
+	const toDateInput = (v) => {
+	  if (!v) return "";
+	  return String(v).split("T")[0];
+	};
 
     (async () => {
       try {
@@ -57,7 +62,7 @@ useEffect(() => {
         state.setForm((p) => ({
           ...p,
           nota: init.nota,
-          tanggalTerima: init.today,
+          tanggalTerima: toDateInput(init.today),
 
           teknisi: init.defaultTeknisi,
           idKaryawan: init.defaultTeknisiId,
@@ -167,4 +172,38 @@ useEffect(() => {
 
     state.setFilteredBarang(result.slice(0, 8));
   }, [state.barangSearch, state.barangList]);
+
+/* ======================================================
+   CACHE PELANGGAN (ON MODAL OPEN)
+====================================================== */
+useEffect(() => {
+  if (!open) return;
+
+  // cegah fetch ulang
+  if (state.pelangganCache.length > 0) return;
+
+  const controller = new AbortController();
+
+  (async () => {
+    try {
+      const res = await postAPI(
+        "pelanggan", 
+        {},
+        controller.signal
+      );
+
+      if (res.status === "OK") {
+        state.setPelangganCache(res.data || []);
+      }
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.error("Gagal cache pelanggan", err);
+      }
+    }
+  })();
+
+  return () => controller.abort();
+}, [open]);
+
+
 }

@@ -4,18 +4,19 @@
 ====================================================== */
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "@/styles/sales-modal.css";
 import {
   initPenjualanModal,
   submitPenjualan,
   loadDetailBarang,
-  getBarangTersedia, // ⬅️ TAMBAH
+  getBarangTersedia,
 } from "@/lib/penjualan/penjualanModalHelper";
 
 export default function SalesModal({ open, onClose, onSuccess, data }) {
-
   const isEdit = Boolean(data?.noNota);
+  const reqIdRef = useRef(0); // ⬅️ cegah race async
+  const dropdownRef = useRef(null);
 
   const [form, setForm] = useState({
     noNota: "",
@@ -30,69 +31,85 @@ export default function SalesModal({ open, onClose, onSuccess, data }) {
   const [items, setItems] = useState([]);
   const [searchBarang, setSearchBarang] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  
 
-/* ================= INIT MODAL ================= */
-useEffect(() => {
-  if (!open) return;
+  /* ================= INIT MODAL ================= */
+  useEffect(() => {
+    if (!open) return;
 
-  /* ================= RESET GLOBAL ================= */
-  setItems([]);
-  setSearchBarang("");
-  setSelectedBarang(null);
+    reqIdRef.current += 1;
+    const reqId = reqIdRef.current;
 
-  if (isEdit) {
-    /* ===== MODE EDIT ===== */
-    loadDetailBarang(data.noNota).then(res => {
-      const { header, items } = res;
+    // reset global state
+    setItems([]);
+    setSearchBarang("");
+    setSelectedBarang(null);
 
-      setForm({
-        noNota: header.ID_Penjualan,
-        tanggal: header.Tanggal,
-        namaPelanggan: header.NamaPelanggan || "",
-        metodeBayar: header.MetodeBayar,
-        statusBayar: header.StatusBayar,
+    // load master barang (sekali)
+    getBarangTersedia().then(res => {
+      if (reqId === reqIdRef.current) {
+        setBarangList(res);
+      }
+    });
+
+    if (isEdit) {
+      /* ===== MODE EDIT ===== */
+      loadDetailBarang(data.noNota).then(res => {
+        if (reqId !== reqIdRef.current) return;
+
+        const { header, items } = res;
+
+        setForm({
+          noNota: header.ID_Penjualan,
+          tanggal: header.Tanggal,
+          namaPelanggan: header.NamaPelanggan || "",
+          metodeBayar: header.MetodeBayar,
+          statusBayar: header.StatusBayar,
+        });
+
+        setItems(
+          items.map(it => ({
+            idBarang: it.ID_Barang,
+            namaBarang: it.NamaBarang,
+            harga: Number(it.Harga),
+          }))
+        );
       });
-
-      setItems(
-        items.map(it => ({
-          idBarang: it.ID_Barang,
-          namaBarang: it.NamaBarang,
-          harga: Number(it.Harga),
-        }))
-      );
-    });
-
-    getBarangTersedia().then(setBarangList);
-
-  } else {
-    /* ===== MODE CREATE ===== */
-
-    const today = new Date().toISOString().split("T")[0];
-
-    // 🔴 PENTING: kosongkan dulu no nota
-    setForm({
-      noNota: "",
-      tanggal: today,
-      namaPelanggan: "",
-      metodeBayar: "Tunai",
-      statusBayar: "Lunas",
-    });
-
-    // ambil barang & generate nota (selalu fresh)
-    Promise.all([
-      getBarangTersedia(),
-      initPenjualanModal(today), // hanya dipakai untuk generate nota
-    ]).then(([barang, res]) => {
-      setBarangList(barang);
-      setForm(f => ({
-        ...f,
+	  /* ===== MODE CREATE ===== */
+} else {
+  initPenjualanModal().then(res => {
+    if (reqId === reqIdRef.current) {
+      setForm({
         noNota: res.noNota,
-      }));
-    });
-  }
+        tanggal: res.tanggal,
+        namaPelanggan: "",
+        metodeBayar: "Tunai",
+        statusBayar: "Lunas",
+      });
+    }
+  });
+}
 
-}, [open, isEdit, data?.noNota]);
+  }, [open, isEdit, data?.noNota]);
 
+useEffect(() => {
+  if (!showDropdown) return;
+
+  const handleClickOutside = e => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(e.target)
+    ) {
+      setShowDropdown(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [showDropdown]);
 
   /* ================= COMPUTED ================= */
   const totalItem = items.length;
@@ -102,31 +119,43 @@ useEffect(() => {
     [items]
   );
 
-  const filteredBarang = useMemo(() => {
-    if (!searchBarang) return barangList;
+const filteredBarang = useMemo(() => {
+  // ID barang yang sudah dipilih
+  const usedIds = new Set(items.map(it => it.idBarang));
 
-    const q = searchBarang.toLowerCase();
-    return barangList.filter(
-      b =>
-        b.namaBarang?.toLowerCase().includes(q) ||
-        String(b.sku || "").toLowerCase().includes(q)
-    );
-  }, [searchBarang, barangList]);
+  const availableBarang = barangList.filter(
+    b => !usedIds.has(b.id)
+  );
+
+  if (!searchBarang) return availableBarang;
+
+  const q = searchBarang.toLowerCase();
+
+  return availableBarang.filter(
+    b =>
+      b.namaBarang?.toLowerCase().includes(q) ||
+      String(b.sku || "").toLowerCase().includes(q)
+  );
+}, [barangList, items, searchBarang]);
+
 
   /* ================= HANDLER ================= */
-const handleChange = async e => {
-  const { name, value } = e.target;
+  const handleChange = async e => {
+    const { name, value } = e.target;
+    setForm(f => ({ ...f, [name]: value }));
 
-  setForm(f => ({ ...f, [name]: value }));
+if (name === "tanggal" && !isEdit) {
+  reqIdRef.current += 1;
+  const reqId = reqIdRef.current;
 
-  if (name === "tanggal" && !isEdit) {
-    // kosongkan dulu agar tidak pakai cache visual
-    setForm(f => ({ ...f, noNota: "" }));
+  const { noNota } = await initPenjualanModal(value);
 
-    const res = await initPenjualanModal(value);
-    setForm(f => ({ ...f, noNota: res.noNota }));
+  if (reqId === reqIdRef.current) {
+    setForm(f => ({ ...f, noNota }));
   }
-};
+}
+
+  };
 
   const addBarang = () => {
     if (!selectedBarang) return;
@@ -178,7 +207,7 @@ const handleChange = async e => {
     try {
       await submitPenjualan(body);
       alert("Transaksi penjualan berhasil disimpan");
-	  onSuccess();
+      onSuccess();
       onClose();
     } catch (err) {
       alert(err.message || String(err));
@@ -251,7 +280,7 @@ const handleChange = async e => {
           {/* RIGHT */}
           <div className="modal-right">
             <div className="add-barang">
-              <div className="search-box">
+              <div className="search-box" ref={dropdownRef}>
                 <input
                   placeholder="Cari barang..."
                   value={searchBarang}

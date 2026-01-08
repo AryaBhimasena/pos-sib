@@ -143,6 +143,7 @@ const handleSendWhatsApp = async () => {
 			  jenisServiceList={jenisServiceList}
 			  setForm={setForm}
 			  handleBiayaChange={handleBiayaChange}
+			  handleChange={handleChange}
 			/>
 
             {/* PELANGGAN */}

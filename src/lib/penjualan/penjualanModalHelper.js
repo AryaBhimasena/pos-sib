@@ -1,4 +1,20 @@
+/* =====================================================
+ * PENJUALAN MODAL HELPER
+   path : lib/penjualan/penjualanModalHelper.js
+ * ===================================================== */
+
+
 import { postAPI } from "@/lib/api";
+
+/* =====================================================
+ * DATE UTIL (LOCAL YYYY-MM-DD)
+ * ===================================================== */
+export function getLocalDateYYYYMMDD(date = new Date()) {
+  const tzOffset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - tzOffset)
+    .toISOString()
+    .slice(0, 10);
+}
 
 /* =====================================================
  * GET BARANG TERSEDIA (SHARED)
@@ -44,24 +60,16 @@ export async function requestNoNotaPenjualan(tanggal) {
  * INIT MODAL PENJUALAN (CREATE ONLY)
  * ⚠️ JANGAN DIPAKAI SAAT EDIT
  * ===================================================== */
-export async function initPenjualanModal(tanggal) {
-  if (!tanggal) {
-    throw new Error("Tanggal wajib diisi");
-  }
+export async function initPenjualanModal(tanggalInput) {
+  const tanggal = tanggalInput || getLocalDateYYYYMMDD();
 
-  const [barangList, noNota] = await Promise.all([
-    getBarangTersedia(),
-    requestNoNotaPenjualan(tanggal),
-  ]);
+  const noNota = await requestNoNotaPenjualan(tanggal);
 
   if (!noNota) {
     throw new Error("No nota tidak berhasil dibuat");
   }
 
-  return {
-    noNota,
-    barangList,
-  };
+  return { noNota, tanggal };
 }
 
 /* =====================================================

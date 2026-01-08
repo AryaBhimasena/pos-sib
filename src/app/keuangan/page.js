@@ -5,7 +5,6 @@ import ContainerCard from "@/components/ContainerCard";
 
 import PembayaranTeknisiTab from "@/components/keuangan/PembayaranTekhnisiTab";
 import LedgerKeuanganTab from "@/components/keuangan/LedgerKeuanganTab";
-import HutangSupplierTab from "@/components/keuangan/HutangSupplierTab";
 
 import "@/styles/pages/keuangan.css";
 
@@ -16,8 +15,6 @@ export default function KeuanganPage() {
     switch (activeTab) {
       case "ledger":
         return <LedgerKeuanganTab />;
-      case "supplier":
-        return <HutangSupplierTab />;
       default:
         return <PembayaranTeknisiTab />;
     }
@@ -49,13 +46,7 @@ export default function KeuanganPage() {
         >
           Ledger Keuangan
         </button>
-
-        <button
-          className={`tab-btn ${activeTab === "supplier" ? "active" : ""}`}
-          onClick={() => setActiveTab("supplier")}
-        >
-          Hutang Supplier
-        </button>
+		
       </div>
 
       {/* ================= TAB BODY ================= */}

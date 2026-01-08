@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useServiceUsedParts } from "./useServiceUsedParts";
 
 /**
@@ -29,6 +29,26 @@ export default function ServiceUsedParts({ open, onChange, initialUsedParts }) {
   initialUsedParts // ⬅️ DATA DARI API getServiceByNota
 );
 
+const comboRef = useRef(null);
+
+useEffect(() => {
+  function handleClickOutside(e) {
+    if (
+      comboRef.current &&
+      !comboRef.current.contains(e.target)
+    ) {
+      setShowBarang(false);
+    }
+  }
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () =>
+    document.removeEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+}, []); // ← aman, setShowBarang stabil
+
 useEffect(() => {
     if (onChange) onChange(usedParts);
   }, [usedParts]);
@@ -44,7 +64,7 @@ useEffect(() => {
 
       {/* INPUT */}
       <div className="form-grid-3">
-        <div className="form-group combobox span-2">
+        <div className="form-group combobox span-2" ref={comboRef}>
           <label>Cari Part</label>
           <input
             placeholder="Cari nama part / SKU"

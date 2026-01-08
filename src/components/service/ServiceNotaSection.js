@@ -62,7 +62,7 @@ export default function ServiceNotaSection({
           <input
             type="date"
             name="estimasiSelesai"
-            value={form.estimasiSelesai}
+            value={form.estimasiSelesai ||""}
             onChange={handleChange}
           />
         </div>

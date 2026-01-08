@@ -47,6 +47,8 @@ export function useServiceState() {
   const [namaList, setNamaList] = useState([]);
   const [hpList, setHpList] = useState([]);
   const [showNama, setShowNama] = useState(false);
+  const [pelangganCache, setPelangganCache] = useState([]);
+
   const [showHp, setShowHp] = useState(false);
   const [activeNama, setActiveNama] = useState(-1);
   const [activeHp, setActiveHp] = useState(-1);
@@ -74,6 +76,8 @@ export function useServiceState() {
     namaList, setNamaList,
     hpList, setHpList,
     showNama, setShowNama,
+	pelangganCache, setPelangganCache,
+
     showHp, setShowHp,
     activeNama, setActiveNama,
     activeHp, setActiveHp,
