@@ -79,11 +79,27 @@
   color: #6b7280;
 }
 
+/* baris horizontal dalam card service */
+.kpi-service-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* masing-masing item KPI */
+.kpi-item {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* sesuaikan warna value (sebelumnya putih, tidak terlihat di background putih) */
 .kpi-value {
   font-size: 22px;
   font-weight: 800;
-  color: #fff;
+  color: #111827;
 }
+
 
 /* ===============================
    REMINDER SECTION
@@ -349,15 +365,11 @@
 }
 
 .kpi-card.revenue {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: #fafafa;
   color: #ffffff;
-  border: none;
-}
-
-.kpi-card.revenue span {
-  color: rgba(255,255,255,0.8);
 }
 
 .kpi-card.revenue strong {
   font-size: 24px;
+  color: #000000;
 }

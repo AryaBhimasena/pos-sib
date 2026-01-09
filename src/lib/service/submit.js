@@ -3,7 +3,8 @@ import { submitService, formatRupiah } from "@/lib/serviceModalHelper";
 export function useServiceSubmit(
   state,
   onClose,
-  mode = "create"
+  mode = "create",
+  onSuccess
 ) {
   const handleChange = (e) =>
     state.setForm({
@@ -62,7 +63,8 @@ export function useServiceSubmit(
         mode
       );
 
-      onClose();
+	  onSuccess?.();
+      onClose?.();
     } catch (err) {
       console.error("Gagal simpan service", err);
       alert("Gagal menyimpan data service");

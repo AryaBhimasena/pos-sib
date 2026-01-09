@@ -347,17 +347,3 @@
 .kpi-card.success strong {
   color: #16a34a;
 }
-
-.kpi-card.revenue {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #ffffff;
-  border: none;
-}
-
-.kpi-card.revenue span {
-  color: rgba(255,255,255,0.8);
-}
-
-.kpi-card.revenue strong {
-  font-size: 24px;
-}

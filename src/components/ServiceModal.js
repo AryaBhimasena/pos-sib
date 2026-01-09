@@ -24,6 +24,7 @@ export default function ServiceModal({
   onClose,
   serviceData = null,
   mode = "create",
+  onSuccess,
 }) {
   const {
     form,
@@ -58,7 +59,7 @@ export default function ServiceModal({
     setActiveHp,
 	isHydrated,
 	jenisServiceList,
-  } = useServiceModal(open, onClose, serviceData, mode);
+  } = useServiceModal(open, onClose, serviceData, mode, onSuccess);
 
 const normalizePhoneNumber = (value = "") => {
   if (!value) return "";

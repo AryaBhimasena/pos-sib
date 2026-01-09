@@ -53,13 +53,6 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          href="/laporan"
-          className={`menu-item ${isActive("/laporan") ? "active" : ""}`}
-        >
-          Laporan
-        </Link>
-
-        <Link
           href="/master"
           className={`menu-item ${isActive("/master") ? "active" : ""}`}
         >

@@ -13,7 +13,8 @@ export function useServiceModal(
   open,
   onClose,
   serviceData,
-  mode
+  mode,
+  onSuccess
 ) {
   const state = useServiceState();
 
@@ -21,7 +22,7 @@ export function useServiceModal(
 
   const customer = useCustomerHandlers(state);
   const barang = useBarangHandlers(state);
-  const submit = useServiceSubmit(state, onClose, mode);
+  const submit = useServiceSubmit(state, onClose, mode, onSuccess);
 
   return {
     ...state,

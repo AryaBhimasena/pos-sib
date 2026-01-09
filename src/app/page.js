@@ -21,6 +21,7 @@ export default function DashboardPage() {
 
   const [selectedService, setSelectedService] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [kpiServiceDiambil, setKpiServiceDiambil] = useState(0);
 
 	const triggerRefresh = () => {
 	  setRefreshKey(prev => prev + 1);
@@ -56,6 +57,7 @@ export default function DashboardPage() {
       setServiceList,
       setKpiServiceDiterima,
       setServiceByTeknisi,
+	  setKpiServiceDiambil,
     });
 
     fetchDashboardBarang({
@@ -158,10 +160,20 @@ async function submitPettyCash(tanggal) {
 
         {/* ================= KPI ================= */}
         <div className="dashboard-kpi">
-          <div className="kpi-card service">
-            <span className="kpi-label">Service Diterima</span>
-            <strong className="kpi-value">{kpiServiceDiterima}</strong>
-          </div>
+<div className="kpi-card service">
+  <div className="kpi-service-row">
+    <div className="kpi-item">
+      <span className="kpi-label">Service Diterima</span>
+      <strong className="kpi-value">{kpiServiceDiterima}</strong>
+    </div>
+
+    <div className="kpi-item">
+      <span className="kpi-label">Service Diambil</span>
+      <strong className="kpi-value">{kpiServiceDiambil}</strong>
+    </div>
+  </div>
+</div>
+
 
           <div className="kpi-card success">
             <span className="kpi-label">Saldo Kas Toko</span>
@@ -204,8 +216,8 @@ async function submitPettyCash(tanggal) {
               )}
 
               {serviceByTeknisi.map(item => (
-                <li key={item.nama}>
-                  <span className="nota">{item.nama}</span>
+                <li key={item.teknisi}>
+                  <span className="nota">{item.teknisi}</span>
                   <small>{item.total} Service</small>
                 </li>
               ))}

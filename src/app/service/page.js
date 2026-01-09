@@ -9,9 +9,12 @@ import { useEffect, useMemo, useState } from "react";
 import ContainerCard from "@/components/ContainerCard";
 import { postAPI } from "@/lib/api";
 import "@/styles/pages/service.css";
+import ServiceModal from "@/components/ServiceModal";
+import { Pencil } from "lucide-react";
 
 export default function TransaksiServicePage() {
   const [list, setList] = useState([]);
+
   const [bulan, setBulan] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -20,6 +23,14 @@ export default function TransaksiServicePage() {
   const [search, setSearch] = useState("");
   const [statusService, setStatusService] = useState("");
   const [statusBayar, setStatusBayar] = useState("");
+
+  const [openService, setOpenService] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const triggerRefresh = () => {
+    setRefreshKey(prev => prev + 1);
+  };
 
   const fetchData = async () => {
     try {
@@ -35,7 +46,7 @@ export default function TransaksiServicePage() {
 
   useEffect(() => {
     fetchData();
-  }, [bulan]);
+  }, [bulan, refreshKey]);
 
   const filtered = useMemo(() => {
     if (!Array.isArray(list)) return [];
@@ -46,7 +57,8 @@ export default function TransaksiServicePage() {
       if (
         search &&
         !`${r.id} ${r.pelanggan}`.toLowerCase().includes(search.toLowerCase())
-      ) return false;
+      )
+        return false;
       return true;
     });
   }, [list, search, statusService, statusBayar]);
@@ -59,6 +71,18 @@ export default function TransaksiServicePage() {
       omzet: filtered.reduce((a, b) => a + (b.grandTotal || 0), 0),
     };
   }, [filtered]);
+
+  const formatTanggal = tanggal => {
+    if (!tanggal) return "";
+    const d = new Date(tanggal);
+    if (isNaN(d)) return tanggal;
+
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+
+    return `${dd}-${mm}-${yyyy}`;
+  };
 
   return (
     <ContainerCard>
@@ -84,19 +108,20 @@ export default function TransaksiServicePage() {
           <span>Total Service</span>
           <strong>{summary.total}</strong>
         </div>
+
         <div className="summary-card success">
           <span>Selesai</span>
           <strong>{summary.selesai}</strong>
         </div>
+
         <div className="summary-card warning">
           <span>Belum Lunas</span>
           <strong>{summary.belumBayar}</strong>
         </div>
+
         <div className="summary-card primary">
           <span>Omzet</span>
-          <strong>
-            Rp {summary.omzet.toLocaleString("id-ID")}
-          </strong>
+          <strong>Rp {summary.omzet.toLocaleString("id-ID")}</strong>
         </div>
       </div>
 
@@ -133,6 +158,7 @@ export default function TransaksiServicePage() {
         <table className="transaksi-table">
           <thead>
             <tr>
+              <th>Aksi</th>
               <th>No Nota</th>
               <th>Tanggal</th>
               <th>Pelanggan</th>
@@ -146,7 +172,7 @@ export default function TransaksiServicePage() {
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan="7" className="empty">
+                <td colSpan="8" className="empty">
                   Tidak ada data
                 </td>
               </tr>
@@ -154,10 +180,26 @@ export default function TransaksiServicePage() {
 
             {filtered.map(row => (
               <tr key={row.id}>
+                {/* AKSI */}
+                <td>
+                  <button
+                    className="icon-button"
+                    title="Edit Service"
+                    onClick={() => {
+                      setSelectedService(row);
+                      setOpenService(true);
+                    }}
+                  >
+                    <Pencil size={16} />
+                  </button>
+                </td>
+
                 <td>{row.id}</td>
-                <td>{row.tanggalTerima}</td>
+                <td>{formatTanggal(row.tanggalTerima)}</td>
                 <td>{row.pelanggan}</td>
-                <td>{row.merekHP} {row.typeHP}</td>
+                <td>
+                  {row.merekHP} {row.typeHP}
+                </td>
                 <td>{row.teknisi}</td>
                 <td>
                   <span className={`status ${row.statusService}`}>
@@ -171,6 +213,21 @@ export default function TransaksiServicePage() {
             ))}
           </tbody>
         </table>
+
+        <ServiceModal
+          open={openService}
+          onClose={() => {
+            setOpenService(false);
+            setSelectedService(null);
+          }}
+          serviceData={selectedService}
+          mode={selectedService ? "edit" : "create"}
+          onSuccess={() => {
+            triggerRefresh();
+            setOpenService(false);
+            setSelectedService(null);
+          }}
+        />
       </div>
     </ContainerCard>
   );

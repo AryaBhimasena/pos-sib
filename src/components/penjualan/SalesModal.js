@@ -207,8 +207,8 @@ if (name === "tanggal" && !isEdit) {
     try {
       await submitPenjualan(body);
       alert("Transaksi penjualan berhasil disimpan");
-      onSuccess();
-      onClose();
+      onSuccess?.();
+      onClose?.();
     } catch (err) {
       alert(err.message || String(err));
     }
