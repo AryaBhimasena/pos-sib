@@ -13,7 +13,6 @@ import ServicePreview from "@/components/service/ServicePreview";
 import ServiceUsedParts from "@/components/service/ServiceUsedParts";
 import ServiceCustomerSection from "@/components/service/ServiceCustomerSection";
 import ServiceTotalBiaya from "@/components/service/ServiceTotalBiaya";
-import ServicePaymentMethod from "@/components/service/ServicePaymentMethod";
 import ServiceNotaSection from "@/components/service/ServiceNotaSection";
 import { useServicePreview } from "@/components/service/useServicePreview";
 import ServiceNotaPDF from "@/components/service/ServiceNotaPDF";
@@ -185,20 +184,14 @@ const handleSendWhatsApp = async () => {
               usedParts={usedParts}
 			  mode={mode}
 			  isHydrated={isHydrated}
+			  handleChange={handleChange}
             />
-
-            {/* METODE PEMBAYARAN */}
-            <ServicePaymentMethod
-              form={form}
-              handleChange={handleChange}
-            />
-
           </div>
 
           {/* PREVIEW STICKY */}
           <ServicePreview
             sourceForm={form}
-            usedParts={usedParts}
+            
           />
 
         </div>

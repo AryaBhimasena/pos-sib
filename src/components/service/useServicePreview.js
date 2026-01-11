@@ -3,44 +3,31 @@
 import { useEffect, useState } from "react";
 
 /**
- * Hook khusus untuk PREVIEW NOTA SERVICE
- * - Mengelola state snapshot
- * - Menentukan Estimasi Biaya / Total Biaya
- * - Aman untuk format rupiah string
+ * Hook PREVIEW NOTA SERVICE
+ * - Tidak melakukan kalkulasi biaya
+ * - Hanya menampilkan snapshot dari state form
+ * - Total biaya = nilai input user (form.grandTotal)
  */
 
-export function useServicePreview(sourceForm, usedParts) {
+export function useServicePreview(sourceForm) {
   const [preview, setPreview] = useState(null);
 
   useEffect(() => {
     if (!sourceForm) return;
 
-    /* ================= NORMALISASI ESTIMASI BIAYA ================= */
+    /* ================= NORMALISASI NILAI ================= */
     const estimasiBiaya = Number(
       String(sourceForm.estimasiBiaya || "").replace(/\D/g, "")
     ) || 0;
 
-    /* ================= HITUNG BIAYA PART ================= */
-    const biayaPart = Array.isArray(usedParts)
-      ? usedParts.reduce(
-          (sum, item) => sum + (Number(item.subtotal) || 0),
-          0
-        )
-      : 0;
+    const totalBiayaService = Number(sourceForm.grandTotal || 0);
 
-    /* ================= JASA TOKO ================= */
-    const jasaToko = Number(sourceForm.jasaToko || 0);
+    /* ================= TENTUKAN LABEL ================= */
+    const biayaLabel =
+      totalBiayaService > 0 ? "Total Biaya" : "Estimasi Biaya";
 
-    /* ================= KOMISI TEKNISI ================= */
-    const komisiTeknisi = Number(sourceForm.komisiTeknisi || 0);
-
-    /* ================= TOTAL BIAYA SERVICE ================= */
-    const totalBiayaService =
-      biayaPart + jasaToko + komisiTeknisi;
-
-    /* ================= TENTUKAN MODE ================= */
-    const hasRealCost =
-      biayaPart > 0 || jasaToko > 0;
+    const biayaValue =
+      totalBiayaService > 0 ? totalBiayaService : estimasiBiaya;
 
     /* ================= SNAPSHOT PREVIEW ================= */
     setPreview({
@@ -56,10 +43,10 @@ export function useServicePreview(sourceForm, usedParts) {
       perangkat: `${sourceForm.merek || ""} ${sourceForm.tipe || ""}`,
       keluhan: sourceForm.keluhan,
 
-      biayaLabel: hasRealCost ? "Total Biaya" : "Estimasi Biaya",
-      biayaValue: hasRealCost ? totalBiayaService : estimasiBiaya,
+      biayaLabel,
+      biayaValue,
     });
-  }, [sourceForm, usedParts]);
+  }, [sourceForm]);
 
   return {
     preview,

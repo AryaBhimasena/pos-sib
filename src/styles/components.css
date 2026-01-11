@@ -670,3 +670,58 @@ body {
   background: #0f172a;
   color: #fff;
 }
+
+/* METODE BAYAR */
+.metodebayar-section {
+  margin-bottom: 16px;
+}
+
+.metodebayar-title {
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.metodebayar-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* RADIO */
+.metodebayar-radio-group {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.metodebayar-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+}
+
+.metodebayar-radio-input {
+  cursor: pointer;
+}
+
+/* SELECT */
+.metodebayar-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+}
+
+.metodebayar-select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  background-color: #ffffff;
+  cursor: pointer;
+}

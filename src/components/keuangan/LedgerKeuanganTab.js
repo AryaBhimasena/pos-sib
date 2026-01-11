@@ -3,22 +3,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { postAPI } from "@/lib/api";
 import "@/styles/ledger-keuangan-tab.css";
+import {
+  getDefaultMonth,
+  getMonthRange,
+  formatTanggalID,
+  filterLedgerRows,
+  orderLedgerRowsWithSaldo,
 
-function getDefaultMonth() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
+  // === TAMBAHAN ===
+  normalizeModalBarangRows,
+  filterModalBarangByTanggal,
+  sumModalBarang,
+} from "@/lib/keuangan/ledgerKeuanganHelper";
 
-function getMonthRange(month) {
-  const [y, m] = month.split("-").map(Number);
-  const start = new Date(y, m - 1, 1);
-  const end = new Date(y, m, 0);
-  const f = d =>
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-      d.getDate()
-    ).padStart(2, "0")}`;
-  return { tanggalAwal: f(start), tanggalAkhir: f(end) };
-}
 
 export default function LedgerKeuanganTab() {
   const [rows, setRows] = useState([]);
@@ -27,6 +24,62 @@ export default function LedgerKeuanganTab() {
   const [tanggalAkhir, setTanggalAkhir] = useState("");
   const [jenisFilter, setJenisFilter] = useState("");
   const [loading, setLoading] = useState(false);
+  
+  const [modalBarang, setModalBarang] = useState({
+	  modalService: 0,
+	  modalPenjualan: 0,
+	});
+
+const fetchModalBarang = async () => {
+  let payload = {};
+
+  if (tanggalAwal || tanggalAkhir) {
+    payload = { tanggalAwal, tanggalAkhir };
+  } else {
+    const range = getMonthRange(bulanAktif);
+    payload = {
+      tanggalAwal: range.tanggalAwal,
+      tanggalAkhir: range.tanggalAkhir,
+    };
+  }
+
+  try {
+    const res = await postAPI("get-nilai-modal-barang", payload);
+
+    if (res?.status !== "OK" || !res?.data) {
+      console.warn("[fetchModalBarang] response tidak valid", res);
+      return;
+    }
+
+const penjualanRaw = res.data.penjualan;
+const serviceRaw = res.data.service;
+
+const penjualan = normalizeModalBarangRows(penjualanRaw);
+const service = normalizeModalBarangRows(serviceRaw);
+
+const penjualanFiltered = filterModalBarangByTanggal(
+  penjualan,
+  { tanggalAwal, tanggalAkhir }
+);
+
+const serviceFiltered = filterModalBarangByTanggal(
+  service,
+  { tanggalAwal, tanggalAkhir }
+);
+
+const modalPenjualan = sumModalBarang(penjualanFiltered);
+const modalService = sumModalBarang(serviceFiltered);
+
+
+    setModalBarang({
+      modalPenjualan,
+      modalService,
+    });
+	
+  } catch (err) {
+    console.error("[fetchModalBarang] ERROR:", err);
+  }
+};
 
   const fetchLedger = async bulan => {
     setLoading(true);
@@ -51,121 +104,154 @@ export default function LedgerKeuanganTab() {
   useEffect(() => {
     fetchLedger(bulanAktif);
   }, [bulanAktif]);
+  
+	useEffect(() => {
+	  fetchModalBarang();
+	}, [bulanAktif, tanggalAwal, tanggalAkhir]);
 
-  const filteredRows = useMemo(() => {
-    return rows.filter(r => {
-      if (jenisFilter && r.jenis !== jenisFilter) return false;
-      if (tanggalAwal && r.tanggal < tanggalAwal) return false;
-      if (tanggalAkhir && r.tanggal > tanggalAkhir) return false;
-      return true;
-    });
-  }, [rows, jenisFilter, tanggalAwal, tanggalAkhir]);
+const filteredRows = useMemo(
+  () =>
+    filterLedgerRows(rows, {
+      jenisFilter,
+      tanggalAwal,
+      tanggalAkhir,
+    }),
+  [rows, jenisFilter, tanggalAwal, tanggalAkhir]
+);
+
+const orderedRows = useMemo(
+  () => orderLedgerRowsWithSaldo(filteredRows),
+  [filteredRows]
+);
 
 const laporan = useMemo(() => {
-  let service = 0;
-  let penjualan = 0;
-  let komisi = 0;
+  let pemasukanService = 0;
+  let pemasukanPenjualan = 0;
+  let komisiTeknisi = 0;
 
-  filteredRows.forEach(r => {
-    if (r.jenis === "Service") service += r.debit;
-    if (r.jenis === "Penjualan") penjualan += r.debit;
-    if (r.jenis === "Bayar Teknisi") komisi += r.kredit;
-  });
+  for (const r of filteredRows) {
+    if (r.jenis === "Service") {
+      pemasukanService += r.debit;
+    }
+
+    if (r.jenis === "Penjualan") {
+      pemasukanPenjualan += r.debit;
+    }
+
+    if (r.jenis === "Bayar Teknisi") {
+      komisiTeknisi += r.kredit;
+    }
+  }
+
+  const totalPemasukan = pemasukanService + pemasukanPenjualan;
+
+  const modalService = modalBarang.modalService;
+  const modalPenjualan = modalBarang.modalPenjualan;
+
+  const totalPengeluaran =
+    modalService + modalPenjualan + komisiTeknisi;
+
+  const labaBersih = totalPemasukan - totalPengeluaran;
 
   return {
-    service,
-    penjualan,
-    totalPemasukan: service + penjualan,
-    komisi,
-    totalPengeluaran: komisi,
+    pemasukanService,
+    pemasukanPenjualan,
+    totalPemasukan,
+
+    modalService,
+    modalPenjualan,
+    komisiTeknisi,
+    totalPengeluaran,
+
+    labaBersih,
   };
-}, [filteredRows]);
+}, [filteredRows, modalBarang]);
 
   const jenisList = [...new Set(rows.map(r => r.jenis))];
 
   return (
     <div className="ledger-layout">
       {/* LEFT */}
-      <aside className="ledger-panel">
-        <h3 className="panel-title">Ringkasan Ledger Keuangan</h3>
+<aside className="ledger-panel">
+  <h3 className="panel-title">Perhitungan Laba / Rugi</h3>
 
-        <div className="filter-block">
-          <div className="date-row">
-            <input
-              type="date"
-              value={tanggalAwal}
-              onChange={e => setTanggalAwal(e.target.value)}
-            />
-            <span>–</span>
-            <input
-              type="date"
-              value={tanggalAkhir}
-              onChange={e => setTanggalAkhir(e.target.value)}
-            />
-          </div>
+  <div className="filter-block">
+    <div className="date-row">
+      <input
+        type="date"
+        value={tanggalAwal}
+        onChange={e => setTanggalAwal(e.target.value)}
+      />
+      <span>–</span>
+      <input
+        type="date"
+        value={tanggalAkhir}
+        onChange={e => setTanggalAkhir(e.target.value)}
+      />
+    </div>
 
-          <input
-            type="month"
-            value={bulanAktif}
-            onChange={e => {
-              setTanggalAwal("");
-              setTanggalAkhir("");
-              setBulanAktif(e.target.value);
-            }}
-          />
-        </div>
+    <input
+      type="month"
+      value={bulanAktif}
+      onChange={e => {
+        setTanggalAwal("");
+        setTanggalAkhir("");
+        setBulanAktif(e.target.value);
+      }}
+    />
+  </div>
 
-<table className="summary">
-  <thead>
-    <tr>
-      <th>Transaksi</th>
-      <th className="num">Debit</th>
-      <th className="num">Kredit</th>
-    </tr>
-  </thead>
+  <table className="summary">
   <tbody>
-    {/* PEMASUKAN */}
-    <tr>
-      <td>Service</td>
-      <td className="num">
-        {laporan.service.toLocaleString("id-ID")}
-      </td>
-      <td />
-    </tr>
-    <tr>
-      <td>Penjualan</td>
-      <td className="num">
-        {laporan.penjualan.toLocaleString("id-ID")}
-      </td>
-      <td />
-    </tr>
-    <tr className="subtotal">
-      <td>Total Pemasukan</td>
-      <td className="num">
-        {laporan.totalPemasukan.toLocaleString("id-ID")}
-      </td>
-      <td />
-    </tr>
+	{/* PEMASUKAN */}
+	<tr className="section income">
+	  <td colSpan={2}>Pemasukan</td>
+	</tr>
+	<tr className="item income">
+	  <td>Service</td>
+	  <td className="num">{laporan.pemasukanService.toLocaleString("id-ID")}</td>
+	</tr>
+	<tr className="item income">
+	  <td>Penjualan</td>
+	  <td className="num">{laporan.pemasukanPenjualan.toLocaleString("id-ID")}</td>
+	</tr>
+	<tr className="subtotal">
+	  <td>Total Pemasukan</td>
+	  <td className="num">{laporan.totalPemasukan.toLocaleString("id-ID")}</td>
+	</tr>
 
-    {/* PENGELUARAN */}
-    <tr>
-      <td>Komisi Teknisi</td>
-      <td />
+	{/* PENGELUARAN */}
+	<tr className="section expense">
+	  <td colSpan={2}>Pengeluaran</td>
+	</tr>
+	<tr className="item expense">
+	  <td>Harga Modal Service</td>
+	  <td className="num">{laporan.modalService.toLocaleString("id-ID")}</td>
+	</tr>
+	<tr className="item expense">
+	  <td>Harga Modal Penjualan</td>
+	  <td className="num">{laporan.modalPenjualan.toLocaleString("id-ID")}</td>
+	</tr>
+	<tr className="item expense">
+	  <td>Komisi Teknisi</td>
+	  <td className="num">{laporan.komisiTeknisi.toLocaleString("id-ID")}</td>
+	</tr>
+	<tr className="subtotal">
+	  <td>Total Pengeluaran</td>
+	  <td className="num">{laporan.totalPengeluaran.toLocaleString("id-ID")}</td>
+	</tr>
+
+    {/* LABA / RUGI */}
+    <tr className="grand-total">
+      <td>Laba Bersih / (Rugi)</td>
       <td className="num">
-        {laporan.komisi.toLocaleString("id-ID")}
-      </td>
-    </tr>
-    <tr className="subtotal">
-      <td>Total Pengeluaran</td>
-      <td />
-      <td className="num">
-        {laporan.totalPengeluaran.toLocaleString("id-ID")}
+        {laporan.labaBersih.toLocaleString("id-ID")}
       </td>
     </tr>
   </tbody>
 </table>
 
-      </aside>
+</aside>
 
       {/* RIGHT */}
       <section className="ledger-table-wrap">
@@ -191,31 +277,36 @@ const laporan = useMemo(() => {
                 <th>Referensi</th>
                 <th className="num">Debit</th>
                 <th className="num">Kredit</th>
+                <th className="num">Saldo</th>
               </tr>
             </thead>
-            <tbody>
-              {loading && (
-                <tr>
-                  <td colSpan={5} className="center">
-                    Memuat data…
-                  </td>
-                </tr>
-              )}
-              {!loading &&
-                filteredRows.map((r, i) => (
-                  <tr key={i}>
-                    <td>{r.tanggal}</td>
-                    <td>{r.jenis}</td>
-                    <td>{r.ref}</td>
-                    <td className="num">
-                      {r.debit ? r.debit.toLocaleString("id-ID") : ""}
-                    </td>
-                    <td className="num">
-                      {r.kredit ? r.kredit.toLocaleString("id-ID") : ""}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
+			<tbody>
+			  {loading && (
+				<tr>
+				  <td colSpan={6} className="center">
+					Memuat data…
+				  </td>
+				</tr>
+			  )}
+
+			  {!loading &&
+				orderedRows.map((r, i) => (
+				  <tr key={i}>
+					<td>{formatTanggalID(r.tanggal)}</td>
+					<td>{r.jenis}</td>
+					<td>{r.ref}</td>
+					<td className="num">
+					  {r.debit ? r.debit.toLocaleString("id-ID") : ""}
+					</td>
+					<td className="num">
+					  {r.kredit ? r.kredit.toLocaleString("id-ID") : ""}
+					</td>
+					<td className="num">
+					  {r.saldo.toLocaleString("id-ID")}
+					</td>
+				  </tr>
+				))}
+			</tbody>
           </table>
         </div>
       </section>

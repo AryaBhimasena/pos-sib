@@ -35,24 +35,69 @@
   font-size: 13px;
 }
 
+/* SECTION HEADER (Pemasukan / Pengeluaran) */
+.summary .section td {
+  font-weight: 600;
+  padding-top: 12px;
+  padding-bottom: 6px;
+  border-top: 1px solid #d1d5db;
+}
+
+/* PEMASUKAN */
+.summary .section.income td {
+  color: #166534;            /* green-800 */
+}
+
+/* PENGELUARAN */
+.summary .section.expense td {
+  color: #991b1b;            /* red-800 */
+}
+
+/* ITEM (INDENT) */
+.summary .item td:first-child {
+  padding-left: 16px;
+}
+
+/* ANGKA */
+.summary .num {
+  text-align: right;
+}
+
+.summary .item.income .num {
+  color: #166534;
+}
+
+.summary .item.expense .num {
+  color: #991b1b;
+}
+
+/* SUBTOTAL */
+.summary .subtotal td {
+  background: #f3f4f6;       /* gray-100 */
+  font-weight: 600;
+  border-top: 1px solid #9ca3af;
+}
+
+/* GRAND TOTAL */
+.summary .grand-total td {
+  border-top: 2px solid #111827;
+  font-weight: 700;
+  padding-top: 8px;
+}
+
+.summary .grand-total.profit td {
+  color: #166534;
+}
+
+.summary .grand-total.loss td {
+  color: #991b1b;
+}
+
 .summary th {
   text-align: left;
   font-weight: 600;
   padding: 6px 4px;
   border-bottom: 1px solid #d1d5db;
-}
-
-.summary td {
-  padding: 6px 4px;
-}
-
-.summary .num {
-  text-align: right;
-}
-
-.summary .subtotal td {
-  border-top: 1px solid #9ca3af;
-  font-weight: 600;
 }
 
 /* RIGHT TABLE */
