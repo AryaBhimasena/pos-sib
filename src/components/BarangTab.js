@@ -11,6 +11,14 @@ export default function DataBarangPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [openForm, setOpenForm] = useState(false);
+  const [mode, setMode] = useState("create"); // create | edit
+  const [selectedBarang, setSelectedBarang] = useState(null);
+  
+	const handleEdit = (item) => {
+	  setMode("edit");
+	  setSelectedBarang(item);
+	  setOpenForm(true);
+	};
 
   // ===============================
   // FILTER STATE
@@ -85,12 +93,16 @@ export default function DataBarangPage() {
           </div>
 
           <div className="dashboard-actions">
-            <button
-              className="action primary"
-              onClick={() => setOpenForm(true)}
-            >
-              + Tambah Barang
-            </button>
+			<button
+			  className="action primary"
+			  onClick={() => {
+				setMode("create");
+				setSelectedBarang(null);
+				setOpenForm(true);
+			  }}
+			>
+			  + Tambah Barang
+			</button>
           </div>
         </div>
 
@@ -177,7 +189,13 @@ export default function DataBarangPage() {
                     <td>
                       <div className="table-actions">
                         <button className="icon-btn" title="Detail">👁</button>
-                        <button className="icon-btn" title="Edit">✎</button>
+                        <button
+						  className="icon-btn"
+						  title="Edit"
+						  onClick={() => handleEdit(item)}
+						>
+						  ✎
+						</button>
                       </div>
                     </td>
                   </tr>
@@ -198,10 +216,12 @@ export default function DataBarangPage() {
       </ContainerCard>
 
       {/* ================= MODAL ================= */}
-      <BarangModal
-        open={openForm}
-        onClose={() => setOpenForm(false)}
-      />
+		<BarangModal
+		  open={openForm}
+		  mode={mode}
+		  data={selectedBarang}
+		  onClose={() => setOpenForm(false)}
+		/>
     </>
   );
 }
