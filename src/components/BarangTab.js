@@ -216,12 +216,16 @@ export default function DataBarangPage() {
       </ContainerCard>
 
       {/* ================= MODAL ================= */}
-		<BarangModal
-		  open={openForm}
-		  mode={mode}
-		  data={selectedBarang}
-		  onClose={() => setOpenForm(false)}
-		/>
+	<BarangModal
+	  open={openForm}
+	  mode={mode}
+	  data={selectedBarang}
+	  onClose={() => setOpenForm(false)}
+	  onSuccess={() => {
+		loadBarang();      // 🔥 fetch ulang
+		setOpenForm(false);
+	  }}
+	/>
     </>
   );
 }

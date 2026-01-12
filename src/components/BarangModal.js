@@ -19,7 +19,7 @@ const initialForm = {
   HargaJual: "",
 };
 
-export default function BarangModal({ open, onClose, mode, data }) {
+export default function BarangModal({ open, onClose, mode, data, onSuccess }) {
   /* ================= MASTER DATA ================= */
   const [master, setMaster] = useState({
     kategoriBarang: [],
@@ -62,29 +62,30 @@ export default function BarangModal({ open, onClose, mode, data }) {
     setForm(f => ({ ...f, [name]: value }));
   };
 
-  const handleSubmit = async e => {
-    e.preventDefault();
+const handleSubmit = async e => {
+  e.preventDefault();
 
-    const payload = {
-      nama: form.NamaBarang,
-      sku: form.SKU,
-      idKategori: form.ID_KategoriBarang,
-      idMerekPart: form.ID_MerekPart,
-      idMerekHP: form.ID_MerekHP,
-      idSupplier: form.ID_Supplier,
-      idLokasi: form.ID_LokasiStock,
-      qty: Number(form.Qty),
-      satuan: "PCS",
-      hargaBeli: Number(form.HargaBeli),
-      hargaJual: Number(form.HargaJual),
-      status: "AKTIF",
-    };
-
-    console.log("CREATE BARANG PAYLOAD:", payload);
-
-    await postAPI("barang/create", payload);
-    onClose();
+  const payload = {
+    nama: form.NamaBarang,
+    sku: form.SKU,
+    idKategori: form.ID_KategoriBarang,
+    idMerekPart: form.ID_MerekPart,
+    idMerekHP: form.ID_MerekHP,
+    idSupplier: form.ID_Supplier,
+    idLokasi: form.ID_LokasiStock,
+    qty: Number(form.Qty),
+    satuan: "PCS",
+    hargaBeli: Number(form.HargaBeli),
+    hargaJual: Number(form.HargaJual),
+    status: "AKTIF",
   };
+
+  const res = await postAPI("barang/create", payload);
+
+  if (res?.status === "OK") {
+    onSuccess?.();   // 🔥 trigger parent
+  }
+};
 
   if (!open) return null;
 
@@ -257,8 +258,6 @@ export default function BarangModal({ open, onClose, mode, data }) {
               </div>
             </div>
           </div>
-        </form>
-
         {/* ================= FOOTER ================= */}
         <div className="barang-modal-footer">
           <button type="button" className="btn ghost" onClick={onClose}>
@@ -273,6 +272,9 @@ export default function BarangModal({ open, onClose, mode, data }) {
 			  {mode === "edit" ? "Preview Barang" : "Simpan Barang"}
 			</button>
         </div>
+        </form>
+
+
       </div>
     </div>
   );
